@@ -1,6 +1,12 @@
 // g++ main.cpp -o app -lsfml-graphics -lsfml-window -lsfml-system && ./app
 #include <SFML/Graphics.hpp>
 #include <iostream>
+#include "classes/hash_table.h"
+#include "classes/list.h"
+#include "classes/priority_queue.h"
+#include "classes/queue.h"
+#include "classes/stack.h"
+using namespace std;
 
 // CLASSES STRUCTURE:
 //  class Traffic Signal: (not all nodes have traffic signals)
