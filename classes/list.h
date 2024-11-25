@@ -1,3 +1,5 @@
+#pragma once
+
 #include <iostream>
 using namespace std;
 
@@ -224,7 +226,6 @@ public:
 
             cout << current->data << " -> ";
             current = current->next;
-
         }
 
         cout << "nullptr" << endl;

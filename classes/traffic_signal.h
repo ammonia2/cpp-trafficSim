@@ -1,12 +1,17 @@
-#include<iostream>
+#pragma once
+
+#include <SFML/Graphics.hpp>
+#include <iostream>
 using namespace std;
 
-// template<typename T>
-class traffic_Signal_Node{
-public:
-    int total;
-    int green, yellow, red;
-    traffic_Signal_Node(int green=0):total(60),green(green),yellow(3){
-        red=total-green+yellow;
+class TrafficSignal {
+    int green, yellow;
+    enum state {RED, YELLOW, GREEN};
+
+    public:
+    TrafficSignal(int g=0) {
+        green = g;
+        yellow = 3;
     }
- };
+};
+

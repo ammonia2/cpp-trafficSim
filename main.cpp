@@ -1,11 +1,14 @@
 // g++ main.cpp -o app -lsfml-graphics -lsfml-window -lsfml-system && ./app
 #include <SFML/Graphics.hpp>
 #include <iostream>
+
 #include "classes/hash_table.h"
 #include "classes/list.h"
 #include "classes/priority_queue.h"
 #include "classes/queue.h"
 #include "classes/stack.h"
+#include "classes/adjacency_list.h"
+
 using namespace std;
 
 // CLASSES STRUCTURE:
@@ -34,3 +37,13 @@ using namespace std;
 //      list of roads, vehicles,
 //      roads and vehicles stored in an adjacency list
 //      clock for updating vehicles
+
+class TrafficManagement { // to be completed by Hassan the artist 😘💕🙌
+    public: // store pointers in vectors plems
+
+};
+
+int main() {
+    AdjacencyList graph;
+    graph.displayGraph();
+}
