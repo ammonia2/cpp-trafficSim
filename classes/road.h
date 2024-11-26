@@ -37,10 +37,6 @@ class Road {
         return os;
     }
     void displayRoads(RenderWindow& window ,int x,int y,float angle){
-        // RectangleShape rectangle(Vector2f(travelTime*20,5));
-        // rectangle.setFillColor(Color::White);
-        // rectangle.setPosition(x, y+5);
-        // rectangle.setRotation(angle);
         int direc=1;
         if(angle>=180)
             direc=-1;
@@ -48,13 +44,13 @@ class Road {
         //Setting coordinates of Intersection
         if(dest->get_X()==0 && dest->get_Y()==0){
             float radianAngle = angle * 3.14159265359 / 180.0;
-            int length = travelTime * 20;
+            int length = travelTime;
             int xEnd = x + length * cos(radianAngle);
             int yEnd = y + length * sin(radianAngle);
             dest->set_X(xEnd);
             dest->set_Y(yEnd);
         }
-
+        cout<<dest->getName()<<" "<<dest->get_X()<<" "<<dest->get_Y()<<endl;
         ConvexShape rectangle;
         rectangle.setPointCount(4);
         rectangle.setPoint(0, Vector2f(x,y+5));  // Top-left

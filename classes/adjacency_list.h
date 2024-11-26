@@ -137,17 +137,18 @@ class AdjacencyList {
             if(!graph[name- 'A'].isEmpty()){
                 int index = 0;
                 float angleStep=360/(graph[name- 'A'].getSize()+1);
-
+                // float angleStep=90;
+                float currentAngle=0.0;
                 //Setting coordinates of Intersection
                 if(intsc->get_X()==0 && intsc->get_Y()==0){
                     // cout<<intsc->getName()<<endl;
                     intsc->set_X(x);
                     intsc->set_Y(y);
                 }
-                float currentAngle=0.0;
                 while (index<graph[name- 'A'].getSize()) {
                     if((graph[name- 'A'].getNode(index))){
                         Road* node_road = &(graph[name- 'A'].getNode(index)->data);
+                        cout<<name<<" "<<intsc->get_X()<<" "<<intsc->get_Y()<<endl;;
                         node_road->displayRoads(window, intsc->get_X()+20, intsc->get_Y(),currentAngle);
                     }
                     currentAngle+=angleStep;
@@ -155,6 +156,7 @@ class AdjacencyList {
                 }
             }
             intsc->displayIntersection(window,intsc->get_X(),intsc->get_Y());
+            // break;
             i+=1;
             // if(i==2)
             //     break;

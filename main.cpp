@@ -100,14 +100,14 @@ class TrafficManagement{ // to be completed by Hasaan the artist 😘💕🙌
 
     public: // store pointers in vectors plems
     void management(RenderWindow& window){
-        graph.displayGraph(window,400,300);
+        graph.displayGraph(window,312,384);
     }
 
 
 };
 
 int main() {
-    RenderWindow window(VideoMode(800, 600), "SFML Basic Example");
+    RenderWindow window(VideoMode(1280, 720), "SFML Basic Example");
     while (window.isOpen()) {
         Event event;
         while (window.pollEvent(event)) {
