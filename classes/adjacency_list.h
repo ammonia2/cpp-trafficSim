@@ -27,13 +27,13 @@ int stringToInt(const string& str) {
 }
 
 struct IntersectionRoad {
-    Intersection intersection;
-    Road road;
+    Intersection* intersection;
+    Road* road;
 };
 
 class AdjacencyList {
     vector<LinkedList<Road>> graph;
-    vector<Intersection> intersections;
+    vector<Intersection*> intersections;
     vector<IntersectionRoad> roads;
 
     void initialiseGraph() {
@@ -50,7 +50,7 @@ class AdjacencyList {
             }
             stringstream ss(line);
             string start, end, weight;
-
+            cout<<line<<endl;
             getline(ss, start, ',');
             getline(ss, end, ',');
             getline(ss, weight, ',');
@@ -58,31 +58,64 @@ class AdjacencyList {
             char startNode = start[0];
             char endNode = end[0];
             int weightInt = stringToInt(weight);
+            cout<<"assigning\n";
+            maxNode = max(maxNode, max(startNode, endNode));
 
-            Intersection a= Intersection(startNode);
-            Intersection b= Intersection(endNode);
+            cout<<"assigning\n";
+            while (intersections.size() < (maxNode-'A')) {
+                cout<<"assigning"<<endl;
+                char val='A';
+                if (intersections.size()!=0) {
+                    val = intersections.back()->getName();
+                    cout<<"assigning"<<char(val+1)<<endl;
+                }
+                else {
+                    cout<<"assigning"<<char(val)<<endl;
 
-            Road edge = Road(weightInt, b);
+                }
+
+                Intersection* newNode = new Intersection(val+1);
+                intersections.push_back(newNode);
+            }
+
+            Intersection* a;
+            for (Intersection* intsc: intersections) {
+                if (intsc->getName() == startNode) {
+                    a= intsc;
+                    cout<<a->getName()<<" assigned\n";
+                    break;
+                }
+            }
+            Intersection* b;
+            for (Intersection* intsc: intersections) {
+                if (intsc->getName() == endNode) {
+                    b= intsc;
+                    cout<<b->getName()<<" assigned\n";
+                    break;
+                }
+
+            }
+
+            Road* edge = new Road(weightInt, b);
             roads.push_back({a, edge});
 
-            maxNode = max(maxNode, max(startNode, endNode));
         }
         // creating the array to store edges for intersections
-        for (char ch = 'A'; ch<=maxNode; ch++) {
-            intersections.push_back(ch);
-            LinkedList<Road> list;
-            graph.push_back(list);
-        }
+        // for (char ch = 'A'; ch<=maxNode; ch++) {
+        //     intersections.push_back(ch);
+        //     LinkedList<Road> list;
+        //     graph.push_back(list);
+        // }
 
         // pushin the edges
         for (IntersectionRoad road: roads) {
             // separated Intersection and List for edge for ease of access.
-            char startNode = road.intersection.getName();
-            char endNode = road.road.getDest().getName();
-            graph[startNode - 'A'].insertAtEnd(road.road);
-            Road* roadPointer = &road.road;
-            intersections[startNode-'A'].addOutRoad(roadPointer);
-            intersections[endNode -'A'].addInRoad(roadPointer);
+            char startNode = road.intersection->getName();
+            char endNode = road.road->getDest()->getName();
+            graph[startNode - 'A'].insertAtEnd(*(road.road));
+
+            intersections[startNode-'A']->addOutRoad(road.road);
+            intersections[endNode -'A']->addInRoad(road.road);
         }
         // for (int i = 0; i < graph.size() - 1; ++i) {
         //     for (int j = 0; j < graph.size() - i - 1; ++j) {
@@ -115,29 +148,29 @@ class AdjacencyList {
     
     void displayGraph(RenderWindow& window, int x,int y) {
         int i=0;
-        for (Intersection intsc : intersections) {
-            char name = intsc.getName();
+        for (Intersection* intsc : intersections) {
+            char name = intsc->getName();
             if(!graph[name- 'A'].isEmpty()){
                 int index = 0;
                 float angleStep=360/(graph[name- 'A'].getSize()+1);
 
                 //Setting coordinates of Intersection
-                if(intsc.get_X()==0 && intsc.get_Y()==0){
-                    cout<<intsc.getName()<<endl;
-                    intsc.set_X(x);
-                    intsc.set_Y(y);
+                if(intsc->get_X()==0 && intsc->get_Y()==0){
+                    // cout<<intsc->getName()<<endl;
+                    intsc->set_X(x);
+                    intsc->set_Y(y);
                 }
                 float currentAngle=0.0;
                 while (index<graph[name- 'A'].getSize()) {
                     if((graph[name- 'A'].getNode(index))){
                         Road* node_road = &(graph[name- 'A'].getNode(index)->data);
-                        node_road->displayRoads(window, intsc.get_X()+20, intsc.get_Y(),currentAngle);
+                        node_road->displayRoads(window, intsc->get_X()+20, intsc->get_Y(),currentAngle);
                     }
                     currentAngle+=angleStep;
                     index++;
                 }
             }
-            intsc.displayIntersection(window,intsc.get_X(),intsc.get_Y());
+            intsc->displayIntersection(window,intsc->get_X(),intsc->get_Y());
             i+=1;
             if(i==2)
                 break;
