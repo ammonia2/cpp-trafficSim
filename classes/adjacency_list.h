@@ -44,75 +44,59 @@ class AdjacencyList {
         char maxNode='\0';
         int counter=0;
         while (getline(network, line)) {
-            if(counter==0){
-                counter+=1;
+            if (counter == 0) {
+                counter += 1;
                 continue;
             }
             stringstream ss(line);
             string start, end, weight;
-            cout<<line<<endl;
             getline(ss, start, ',');
             getline(ss, end, ',');
             getline(ss, weight, ',');
-
+        
             char startNode = start[0];
             char endNode = end[0];
             int weightInt = stringToInt(weight);
-            cout<<"assigning\n";
             maxNode = max(maxNode, max(startNode, endNode));
-
-            cout<<"assigning\n";
-            while (intersections.size() < (maxNode-'A')) {
-                cout<<"assigning"<<endl;
-                char val='A';
-                if (intersections.size()!=0) {
-                    val = intersections.back()->getName();
-                    cout<<"assigning"<<char(val+1)<<endl;
-                }
-                else {
-                    cout<<"assigning"<<char(val)<<endl;
-
-                }
-
-                Intersection* newNode = new Intersection(val+1);
+        
+            // Ensure intersections vector is large enough
+            while (intersections.size() <= (maxNode - 'A')) {
+                char val = 'A' + intersections.size();
+                Intersection* newNode = new Intersection(val);
                 intersections.push_back(newNode);
             }
-
-            Intersection* a;
-            for (Intersection* intsc: intersections) {
+        
+            Intersection* a = nullptr;
+            for (Intersection* intsc : intersections) {
                 if (intsc->getName() == startNode) {
-                    a= intsc;
-                    cout<<a->getName()<<" assigned\n";
+                    a = intsc;
                     break;
                 }
             }
-            Intersection* b;
-            for (Intersection* intsc: intersections) {
+        
+            Intersection* b = nullptr;
+            for (Intersection* intsc : intersections) {
                 if (intsc->getName() == endNode) {
-                    b= intsc;
-                    cout<<b->getName()<<" assigned\n";
+                    b = intsc;
                     break;
                 }
-
             }
-
-            Road* edge = new Road(weightInt, b);
-            roads.push_back({a, edge});
-
+        
+            if (a && b) {
+                Road* edge = new Road(weightInt, b);
+                roads.push_back({a, edge});
+            } else {
+                cout << "Intersection not found: " << startNode << " " << endNode << "\n";
+            }
         }
-        // creating the array to store edges for intersections
-        // for (char ch = 'A'; ch<=maxNode; ch++) {
-        //     intersections.push_back(ch);
-        //     LinkedList<Road> list;
-        //     graph.push_back(list);
-        // }
 
+        graph.resize(maxNode - 'A' + 1);
         // pushin the edges
         for (IntersectionRoad road: roads) {
             // separated Intersection and List for edge for ease of access.
             char startNode = road.intersection->getName();
             char endNode = road.road->getDest()->getName();
-            graph[startNode - 'A'].insertAtEnd(*(road.road));
+            graph[startNode - 'A'].insertAtEnd(*(road.road)); //
 
             intersections[startNode-'A']->addOutRoad(road.road);
             intersections[endNode -'A']->addInRoad(road.road);
@@ -172,8 +156,8 @@ class AdjacencyList {
             }
             intsc->displayIntersection(window,intsc->get_X(),intsc->get_Y());
             i+=1;
-            if(i==2)
-                break;
+            // if(i==2)
+            //     break;
             // x+=50;
             // y+=50;
             
