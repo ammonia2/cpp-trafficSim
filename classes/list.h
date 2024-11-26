@@ -7,7 +7,7 @@ template <typename T>
 
 class LinkedList {
 
-private:
+public:
 
     struct Node {
 
@@ -17,9 +17,24 @@ private:
         Node(T value) : data(value), next(nullptr) {}
 
     };
-
+private:
     Node* head; 
     int size;
+
+
+public:
+
+    LinkedList() : head(nullptr), size(0) {}
+
+    ~LinkedList() {
+
+        while (size > 0) {
+
+            removeAtStart();
+
+        }
+
+    }
 
     Node* getNode(int index) const {
 
@@ -41,21 +56,6 @@ private:
         return current;
 
     }
-
-public:
-
-    LinkedList() : head(nullptr), size(0) {}
-
-    ~LinkedList() {
-
-        while (size > 0) {
-
-            removeAtStart();
-
-        }
-
-    }
-
     void insertAtStart(T value) {
 
         Node* newNode = new Node(value);
@@ -236,6 +236,9 @@ public:
 
         return size;
 
+    }
+    Node* return_Head(){
+        return head;
     }
     
 };

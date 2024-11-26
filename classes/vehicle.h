@@ -4,6 +4,7 @@
 #include <SFML/Graphics.hpp>
 #include <iostream>
 #include <vector>
+using namespace std;
 
 class Road;
 
@@ -14,13 +15,13 @@ struct Coord {
 };
 
 class Vehicle {
-    std::string name;
-    std::vector<Road*> route;
+    string name;
+    vector<Road*> route;
     int currRoadIndex; // will change as road changes
     Coord position;
 
     public:
-    Vehicle(std::string n) : name(n) {}
+    Vehicle(string n) : name(n) {}
 
     void addPath(Road* r) {
         route.push_back(r);
@@ -28,9 +29,9 @@ class Vehicle {
 };
 
 class EmergencyVehicle : public Vehicle { // dynamic routing
-    std::string priority;
+    string priority;
 
     public:
-    EmergencyVehicle(std::string n, std::string p) : Vehicle(n), priority(p) {}
+    EmergencyVehicle(string n, string p) : Vehicle(n), priority(p) {}
 };
 

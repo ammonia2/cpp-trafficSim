@@ -11,8 +11,10 @@
 #include "vehicle.h"
 #include "traffic_signal.h"
 #include "list.h"
+using namespace std;
+using namespace sf;
 
-int stringToInt(const std::string& str) {
+int stringToInt(const string& str) {
     int result = 0;
 
     for (int i = 0; i < str.length(); ++i) {
@@ -30,24 +32,28 @@ struct IntersectionRoad {
 };
 
 class AdjacencyList {
-    std::vector<LinkedList<Road>> graph;
-    std::vector<Intersection> intersections;
-    std::vector<IntersectionRoad> roads;
+    vector<LinkedList<Road>> graph;
+    vector<Intersection> intersections;
+    vector<IntersectionRoad> roads;
 
     void initialiseGraph() {
         fstream network("files/road_network.csv", ios::in);
         fstream signals("files/traffic_signal_timings.csv", ios::in);
 
-        std::string line;
-        char maxNode;
-
-        while (std::getline(network, line)) {
+        string line;
+        char maxNode='\0';
+        int counter=0;
+        while (getline(network, line)) {
+            if(counter==0){
+                counter+=1;
+                continue;
+            }
             stringstream ss(line);
-            std::string start, end, weight;
+            string start, end, weight;
 
-            std::getline(ss, start, ',');
-            std::getline(ss, end, ',');
-            std::getline(ss, weight, ',');
+            getline(ss, start, ',');
+            getline(ss, end, ',');
+            getline(ss, weight, ',');
 
             char startNode = start[0];
             char endNode = end[0];
@@ -59,9 +65,8 @@ class AdjacencyList {
             Road edge = Road(weightInt, b);
             roads.push_back({a, edge});
 
-            maxNode = std::max(maxNode, std::max(startNode, endNode));
+            maxNode = max(maxNode, max(startNode, endNode));
         }
-
         // creating the array to store edges for intersections
         for (char ch = 'A'; ch<=maxNode; ch++) {
             intersections.push_back(ch);
@@ -79,6 +84,25 @@ class AdjacencyList {
             intersections[startNode-'A'].addOutRoad(roadPointer);
             intersections[endNode -'A'].addInRoad(roadPointer);
         }
+        // for (int i = 0; i < graph.size() - 1; ++i) {
+        //     for (int j = 0; j < graph.size() - i - 1; ++j) {
+        //         int a=0,b=0;
+        //         if (!graph[j].isEmpty()) {
+        //             // cout<<"yes"<<endl;
+        //             a=graph[j].getSize();
+        //         }
+        //         if(!graph[j+1].isEmpty()){
+        //             // cout<<"yes1"<<endl;
+        //             b=graph[j + 1].getSize();
+        //         }
+        //         if (a > b) {
+        //             swap(graph[j], graph[j + 1]);
+        //         }
+        //     }
+        // }
+        // std::sort(graph.begin(), graph.end(), [](const LinkedList<Road>& a, const LinkedList<Road>& b) {
+        // return a.getSize() > b.getSize(); // Descending order
+        // });
 
         network.close();
         signals.close();
@@ -88,12 +112,38 @@ class AdjacencyList {
     AdjacencyList() {
         initialiseGraph();
     }
-
-    void displayGraph() {
+    
+    void displayGraph(RenderWindow& window, int x,int y) {
+        int i=0;
         for (Intersection intsc : intersections) {
             char name = intsc.getName();
-            cout<<name<<" goes to: ";
-            graph[name- 'A'].display();
+            if(!graph[name- 'A'].isEmpty()){
+                int index = 0;
+                float angleStep=360/(graph[name- 'A'].getSize()+1);
+
+                //Setting coordinates of Intersection
+                if(intsc.get_X()==0 && intsc.get_Y()==0){
+                    cout<<intsc.getName()<<endl;
+                    intsc.set_X(x);
+                    intsc.set_Y(y);
+                }
+                float currentAngle=0.0;
+                while (index<graph[name- 'A'].getSize()) {
+                    if((graph[name- 'A'].getNode(index))){
+                        Road* node_road = &(graph[name- 'A'].getNode(index)->data);
+                        node_road->displayRoads(window, intsc.get_X()+20, intsc.get_Y(),currentAngle);
+                    }
+                    currentAngle+=angleStep;
+                    index++;
+                }
+            }
+            intsc.displayIntersection(window,intsc.get_X(),intsc.get_Y());
+            i+=1;
+            if(i==2)
+                break;
+            // x+=50;
+            // y+=50;
+            
         }
     }
 };
