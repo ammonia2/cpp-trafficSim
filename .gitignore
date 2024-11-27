@@ -31,4 +31,7 @@
 *.out
 *.app
 
+# Also Executables
+*.
+
 .vscode/
