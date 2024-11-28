@@ -37,21 +37,53 @@ public:
 
     }
 
-    int size() const {
+    int size() const { // return size of vector
 
         return sz;
 
     }
 
-    int capacity() const {
+    int capacity() const { // return max capacity of vector
 
         return cap;
 
     }
 
-    bool empty() const {
+    bool empty() const { // clear the vector
 
         return sz == 0;
+
+    }
+
+    //Note: 
+    //dummy used to handle error cases where index is out of range by returning a referencable object.
+    //const functions are the same as the functions defined above them with the difference that the vector object is not modified in them.
+
+    T& at(int index) { // return data at specified index
+
+        if (index < 0 || index >= sz) {
+
+            cout << "Index out of range\n";
+            static T dummy;        
+            return dummy;
+
+        }
+
+        return data[index];
+
+    }
+
+    const T& at(int index) const { // same as above but the vector object is not modified
+
+        if (index < 0 || index >= sz) {
+
+            cout << "Index out of range\n";
+            static T dummy;
+            return dummy;
+
+        }
+
+        return data[index];
 
     }
 
