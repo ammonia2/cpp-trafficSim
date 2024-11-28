@@ -57,7 +57,7 @@ public:
 
     //Note: 
     //dummy used to handle error cases where index is out of range by returning a referencable object.
-    //const functions are the same as the functions defined above them with the difference that the vector object is not modified in them.
+    //const functions are the same as the functions defined above them with the difference that the vector object is not modified in them, useful for const vector objects.
 
     T& at(int index) { // return data at specified index
 
@@ -73,7 +73,7 @@ public:
 
     }
 
-    const T& at(int index) const { // same as above but the vector object is not modified
+    const T& at(int index) const { 
 
         if (index < 0 || index >= sz) {
 
@@ -82,6 +82,18 @@ public:
             return dummy;
 
         }
+
+        return data[index];
+
+    }
+
+    T& operator[](int index) { // use operator overloading to define [] to reference given index
+
+        return data[index];
+
+    }
+
+    const T& operator[](int index) const {
 
         return data[index];
 
