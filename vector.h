@@ -49,7 +49,7 @@ public:
 
     }
 
-    bool empty() const { // clear the vector
+    bool empty() const { // return if vector is empty or not
 
         return sz == 0;
 
@@ -198,6 +198,22 @@ public:
         }
 
         sz--;
+
+    }
+
+    void clear() { // clear the contents of the vector
+
+        sz = 0;
+
+    }
+
+    void reserve(int newCap) { // allocate an amount of memory to the vector
+
+        if (newCap > cap) {
+
+            resizeCapacity(newCap);
+
+        }
 
     }
 
