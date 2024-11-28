@@ -99,6 +99,62 @@ public:
 
     }
 
+    T& front() { // return the first element in the vector
+
+        if (empty()) {
+
+            cout << "Vector is empty\n";
+            static T dummy;
+            return dummy;
+
+        }
+
+        return data[0];
+
+    }
+
+    const T& front() const {
+
+        if (empty()) {
+
+            cout << "Vector is empty\n";
+            static T dummy;
+            return dummy;
+
+        }
+
+        return data[0];
+
+    }
+
+    T& back() { // return the last element in the vector
+
+        if (empty()) {
+
+            cout << "Vector is empty\n";
+            static T dummy;
+            return dummy;
+
+        }
+
+        return data[sz - 1];
+
+    }
+
+    const T& back() const {
+
+        if (empty()) {
+
+            cout << "Vector is empty\n";
+            static T dummy;
+            return dummy;
+
+        }
+
+        return data[sz - 1];
+
+    }
+
 };
 
 
