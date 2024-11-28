@@ -15,10 +15,16 @@ class Intersection {
     vector<Road*>inRoads;
     vector<Road*>outRoads;
     vector<TrafficSignal> signals;
+    int greenTime;
     int x,y;
+
     public:
     Intersection (char n):x(0),y(0) {
         name =n;
+    }
+
+    void setGreenTime(int t) {
+        greenTime = t;
     }
 
     void addOutRoad(Road* r) {

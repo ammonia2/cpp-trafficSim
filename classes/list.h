@@ -1,6 +1,8 @@
 #pragma once
 
 #include <iostream>
+#include <type_traits>
+#include "road.h"
 using namespace std;
 
 template <typename T>
@@ -34,6 +36,28 @@ public:
 
         }
 
+    }
+
+    // to work only for Road* data type. Otherwise causes double free errors
+    // (could be resolved by accessing as reference. meh 😪)
+    template <typename U = T>
+    typename std::enable_if<std::is_same<U, Road*>::value>::type
+    printList() const {
+        Node* current = head;
+        if (!current) {
+            std::cout << "List is empty." << std::endl;
+            return;
+        }
+
+        while (current) {
+            std::cout << current->data->getDest()->getName() << " -> ";
+            current = current->next;
+        }
+        std::cout << "null" << std::endl;
+    }
+
+    Node* getHead() const {
+        return head;
     }
 
     Node* getNode(int index) const {
@@ -141,6 +165,7 @@ public:
         Node* temp = head;
         head = head->next;
         delete temp;
+        temp= nullptr;
         size--;
 
     }

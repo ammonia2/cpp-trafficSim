@@ -12,20 +12,19 @@ using namespace sf;
 
 class Vehicle;
 
-// struct Coord {
-//     int x, y;
-
-//     Coord(int i=0, int j=0): x(i), y(j) {}
-// };
-
 class Road {
     Intersection* dest;
     int travelTime; //weight
     vector<Vehicle*> vehicles;
+    string status;
 
     public:
     Road(int time, Intersection* b): dest(b) {
         travelTime = time;
+    }
+
+    void setStatus(string s) {
+        status = s;
     }
 
     Intersection*& getDest() {

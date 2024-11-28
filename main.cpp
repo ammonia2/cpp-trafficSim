@@ -108,18 +108,21 @@ class TrafficManagement{ // to be completed by Hasaan the artist 😘💕🙌
 
 int main() {
     RenderWindow window(VideoMode(1280, 720), "SFML Basic Example");
-    while (window.isOpen()) {
-        Event event;
-        while (window.pollEvent(event)) {
-            if (event.type == Event::Closed) {
-                window.close();
-            }
-        }
-        TrafficManagement obj;
-        obj.management(window);
-        // window.clear();
-        window.display();
-    }
+    // while (window.isOpen()) {
+    //     Event event;
+    //     while (window.pollEvent(event)) {
+    //         if (event.type == Event::Closed) {
+    //             window.close();
+    //         }
+    //     }
+    //     TrafficManagement obj;
+    //     obj.management(window);
+    //     // window.clear();
+    //     window.display();
+    // }
     // AdjacencyList graph;
     // graph.displayGraph();
+    TrafficManagement obj;
+
+    obj.management(window);
 }
