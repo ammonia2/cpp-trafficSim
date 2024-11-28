@@ -155,6 +155,52 @@ public:
 
     }
 
+    void push_back(const T& value) { // insert element at end of vector
+
+        if (sz == cap) {
+
+            if (cap == 0) {
+
+                cap = 1;  
+            } 
+            
+            else {
+
+                cap *= 2; 
+
+            }
+
+            T* newData = new T[cap];  
+            
+            for (int i = 0; i < sz; ++i) {
+
+                newData[i] = data[i];
+
+            }
+
+            delete[] data;  
+            data = newData;  
+
+        }
+
+        data[sz++] = value;
+
+    }
+
+
+    void pop_back() { // remove element from end of vector
+
+        if (empty()) {
+
+            cout << "Vector is empty\n";
+            return;
+
+        }
+
+        sz--;
+
+    }
+
 };
 
 
