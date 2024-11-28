@@ -217,6 +217,16 @@ public:
 
     }
 
+    void shrink_to_fit() { // shrink the vector to its current size
+
+        if (sz < cap) {
+
+            resizeCapacity(sz);
+
+        }
+
+    }
+
 };
 
 
