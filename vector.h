@@ -227,6 +227,65 @@ public:
 
     }
 
+    void insert(int index, const T& value) {
+
+        if (index < 0 || index > sz) {
+
+            cout << "Index out of range\n";
+            return;
+
+        }
+
+        if (sz == cap) {
+
+            int newCap;
+
+            if (cap == 0) {
+
+                newCap = 1;
+
+            }
+            
+            else {
+
+                newCap = cap * 2;
+
+            }
+
+            resizeCapacity(newCap);
+
+        }
+
+        for (int i = sz; i > index; --i) {
+
+            data[i] = data[i - 1];
+
+        }
+
+        data[index] = value;
+        ++sz;
+
+    }
+
+    void erase(int index) {
+
+        if (index < 0 || index >= sz) {
+
+            cout << "Index out of range\n";
+            return;
+
+        }
+
+        for (int i = index; i < sz - 1; ++i) {
+
+            data[i] = data[i + 1];
+
+        }
+
+        sz--;
+
+    }
+
 };
 
 
