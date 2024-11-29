@@ -2,7 +2,7 @@
 
 #include <SFML/Graphics.hpp>
 #include <iostream>
-#include <vector>
+#include "vector.h"
 #include "road.h"
 #include "traffic_signal.h"
 using namespace std;
@@ -12,9 +12,9 @@ class Road;
 
 class Intersection {
     char name;
-    vector<Road*>inRoads;
-    vector<Road*>outRoads;
-    vector<TrafficSignal> signals;
+    Vector<Road*>inRoads;
+    Vector<Road*>outRoads;
+    Vector<TrafficSignal> signals;
     int greenTime;
     int x,y;
 

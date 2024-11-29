@@ -3,7 +3,7 @@
 #include "road.h"
 #include <SFML/Graphics.hpp>
 #include <iostream>
-#include <vector>
+#include "vector.h"
 #include "intersection.h"
 using namespace std;
 
@@ -17,7 +17,7 @@ struct Coord {
 
 class Vehicle {
     string name;
-    vector<Road*> route;
+    Vector<Road*> route;
     int currRoadIndex; // will change as road changes
     Coord position;
     Intersection* start, *end;

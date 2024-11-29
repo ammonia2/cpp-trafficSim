@@ -1,7 +1,7 @@
 #pragma once
 
 #include <iostream>
-#include <vector>
+#include "vector.h"
 #include <fstream>
 #include <string>
 #include <sstream>
@@ -11,8 +11,12 @@
 #include "vehicle.h"
 #include "traffic_signal.h"
 #include "list.h"
+#include "priority_queue.h"
+
 using namespace std;
 using namespace sf;
+
+#define INT_MAX 10000000
 
 int stringToInt(const string& str) {
     int result = 0;
@@ -31,12 +35,30 @@ struct IntersectionRoad {
     Road* road;
 };
 
+class DistanceNode { // for priority q
+public:
+    Intersection* intersection;
+    int distance;
+
+    DistanceNode() {}
+
+    DistanceNode(Intersection* intersection, int distance) : intersection(intersection), distance(distance) {}
+
+    bool operator<(const DistanceNode& other) const {
+        return distance < other.distance;
+    }
+
+    bool operator > (const DistanceNode& other) const {
+        return distance > other.distance;
+    }
+};
+
 class AdjacencyList {
-    vector<IntersectionRoad> roads; // temporary
-    vector<LinkedList<Road*>> graph;
-    vector<Intersection*> intersections;
-    vector<Vehicle*> vehicles;
-    vector<EmergencyVehicle*> emergencyVehicles;
+    Vector<IntersectionRoad> roads; // temporary
+    Vector<LinkedList<Road*>> graph;
+    Vector<Intersection*> intersections;
+    Vector<Vehicle*> vehicles;
+    Vector<EmergencyVehicle*> emergencyVehicles;
 
     void loadEmergencyVehicles(fstream& file) {
         string line;
@@ -157,7 +179,7 @@ class AdjacencyList {
             int weightInt = stringToInt(weight);
             maxNode = max(maxNode, max(startNode, endNode));
         
-            // Ensure intersections vector is large enough
+            // Ensure intersections Vector is large enough
             while (intersections.size() <= (maxNode - 'A')) {
                 char val = 'A' + intersections.size();
                 Intersection* newNode = new Intersection(val);
@@ -206,6 +228,7 @@ class AdjacencyList {
         loadSignalTimings(signals_file);
         loadVehicles(vehicles_file);
         loadEmergencyVehicles(EmergencyVehicles_file);
+
     }
 
     public:
@@ -213,6 +236,78 @@ class AdjacencyList {
         initialiseGraph();
     }
     
+    Vector<char> dijkstraAlgo(Intersection* start, Intersection* end) {
+        // setting initial distances to MAX, visited, and priority q
+        Vector<int> distance;
+        Vector<char> previousReferences;
+        Vector<bool> visited;
+        PriorityQueue<DistanceNode> pq(true, intersections.size());
+    
+        distance.resize(intersections.size());
+        previousReferences.resize(intersections.size());
+        visited.resize(intersections.size());
+        for (bool v: visited) v=false;
+    
+        for (Intersection* intsc : intersections) {
+            distance[intsc->getName() - 'A'] = INT_MAX;
+            previousReferences[intsc->getName() - 'A'] = '\0';
+        }
+    
+        distance[start->getName() - 'A'] = 0;
+        pq.push(DistanceNode(start, 0));
+    
+        // main algo
+        while (!pq.isEmpty()) {
+            DistanceNode minNode = pq.top();
+            pq.pop();
+    
+            Intersection* minIntersection = minNode.intersection;
+            char minNodeName = minIntersection->getName();
+    
+            if (visited[minNodeName - 'A']) {
+                continue;
+            }
+    
+            visited[minNodeName - 'A'] = true;
+    
+            LinkedList<Road*>& edges = graph[minNodeName - 'A'];
+            LinkedList<Road*>::Node* edge = edges.getHead();
+    
+            while (edge) {
+                Intersection* neighbour = edge->data->getDest();
+                int weight = edge->data->getWeight();
+                int tempDistance = distance[minNodeName - 'A'] + weight;
+    
+                if (tempDistance < distance[neighbour->getName() - 'A']) {
+                    distance[neighbour->getName() - 'A'] = tempDistance;
+                    previousReferences[neighbour->getName() - 'A'] = minNodeName;
+                    pq.push(DistanceNode(neighbour, tempDistance));
+                }
+    
+                edge = edge->next;
+            }
+        }
+    
+        return previousReferences;
+    }
+    
+    Vector<char> constructPath(Vector<char>& previousRefs, Intersection* start, Intersection* end) {
+        Vector<char> path;
+        for (char at = end->getName(); at != '\0'; at = previousRefs[at - 'A']) {
+            path.push_back(at);
+        }
+        reverse(path.begin(), path.end());
+    
+        // If the start node is not in the path, it means there is no path
+        if (path.empty() || path[0] != start->getName()) {
+            path.clear();
+        }
+    
+        return path;
+    }
+
+    void aStarAlgo() {}
+
     void displayGraph(RenderWindow& window, int x,int y) {
         int i=0;
         for (Intersection* intsc : intersections) {

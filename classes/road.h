@@ -4,8 +4,8 @@
 #include "vehicle.h"
 #include "intersection.h"
 #include <iostream>
-#include <vector>
-#include<cmath>
+#include "vector.h"
+#include <cmath>
 using namespace std;
 using namespace sf;
 
@@ -15,7 +15,7 @@ class Vehicle;
 class Road {
     Intersection* dest;
     int travelTime; //weight
-    vector<Vehicle*> vehicles;
+    Vector<Vehicle*> vehicles;
     string status;
 
     public:
@@ -29,6 +29,10 @@ class Road {
 
     Intersection*& getDest() {
         return dest;
+    }
+
+    int getWeight() {
+        return travelTime;
     }
 
     friend ostream& operator<<(ostream& os, const Road& road) {

@@ -1,3 +1,5 @@
+#pragma once
+
 #include <iostream>
 using namespace std;
 
@@ -55,9 +57,10 @@ public:
 
     }
 
-    //Note: 
+    // Note: 
     //dummy used to handle error cases where index is out of range by returning a referencable object.
-    //const functions are the same as the functions defined above them with the difference that the vector object is not modified in them, useful for const vector objects.
+    // const functions are the same as the functions defined above them with the difference that the 
+    // vector object is not modified in them, useful for const vector objects.
 
     T& at(int index) { // return data at specified index
 
@@ -284,6 +287,35 @@ public:
 
         sz--;
 
+    }
+
+    void resize(int newSize) {
+        if (newSize > cap) {
+            resizeCapacity(newSize);
+        }
+        if (newSize > sz) {
+            for (int i = sz; i < newSize; ++i) {
+                data[i] = T();
+            }
+        }
+        sz = newSize;
+    }
+
+    // Functions to support range-based for loop
+    T* begin() {
+        return data;
+    }
+
+    const T* begin() const {
+        return data;
+    }
+
+    T* end() {
+        return data + sz;
+    }
+
+    const T* end() const {
+        return data + sz;
     }
 
 };

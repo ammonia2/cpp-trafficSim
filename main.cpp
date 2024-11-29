@@ -8,6 +8,7 @@
 #include "classes/queue.h"
 #include "classes/stack.h"
 #include "classes/adjacency_list.h"
+#include "classes/vector.h"
 
 using namespace std;
 using namespace sf;
@@ -92,9 +93,9 @@ class TrafficSignal;
 
 class TrafficManagement{ // to be completed by Hasaan the artist 😘💕🙌
 
-    vector<Intersection*> intersection;
-    vector<Road*> roads;
-    vector<Vehicle*> vehicles;
+    Vector<Intersection*> intersection;
+    Vector<Road*> roads;
+    Vector<Vehicle*> vehicles;
     AdjacencyList graph;
     Clock clock;
 
