@@ -236,7 +236,7 @@ class AdjacencyList {
         initialiseGraph();
     }
     
-    Vector<char> dijkstraAlgo(Intersection* start, Intersection* end) {
+    Vector<char> dijkstraAlgo(Intersection* start, Intersection* end) { // returns a list of closest previous nodes for each nodes that can be tracked to a single starting point through constructPath
         // setting initial distances to MAX, visited, and priority q
         Vector<int> distance;
         Vector<char> previousReferences;
