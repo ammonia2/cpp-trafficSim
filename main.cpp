@@ -1,6 +1,8 @@
 // g++ main.cpp -o app -lsfml-graphics -lsfml-window -lsfml-system && ./app
 #include <SFML/Graphics.hpp>
 #include <iostream>
+#include <chrono>
+#include <thread>
 
 #include "classes/hash_table.h"
 #include "classes/list.h"
@@ -100,8 +102,24 @@ class TrafficManagement{ // to be completed by Hasaan the artist 😘💕🙌
     Clock clock;
 
     public: // store pointers in vectors plems
-    void management(RenderWindow& window){
+    void management(RenderWindow& window) {
         graph.displayGraph(window,312,384);
+    }
+
+    void startSimulation() {
+        static auto lastUpdate = chrono::steady_clock::now();
+
+        while (true) {
+            auto now = chrono::steady_clock::now();
+
+            if (chrono::duration_cast<chrono::seconds>(now - lastUpdate).count() >= 1) { // 1sec
+                graph.updateSimulation();
+                lastUpdate = now;
+            }
+
+            this_thread::sleep_for(chrono::milliseconds(10)); // to check in periods of 0.2?
+            // will maybe cause probs if mutliple calculations needed per second
+        }
     }
 
 
@@ -126,4 +144,6 @@ int main() {
     TrafficManagement obj;
 
     obj.management(window);
+
+    obj.startSimulation();
 }

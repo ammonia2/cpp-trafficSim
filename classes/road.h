@@ -4,7 +4,7 @@
 #include "vehicle.h"
 #include "intersection.h"
 #include <iostream>
-#include "vector.h"
+#include "hashtable.h"
 #include <cmath>
 using namespace std;
 using namespace sf;
@@ -15,7 +15,7 @@ class Vehicle;
 class Road {
     Intersection* dest;
     int travelTime; //weight
-    Vector<Vehicle*> vehicles;
+    HashTable<string, Vehicle*> hashmap;
     string status;
 
     public:
@@ -35,10 +35,19 @@ class Road {
         return travelTime;
     }
 
+    void insertVehicle(Vehicle* vehicle) {
+        hashmap.insert(vehicle->getName(), vehicle);
+    }
+
+    void removeVehicle(Vehicle* vehicle) {
+        hashmap.remove(vehicle->getName());
+    }
+
     friend ostream& operator<<(ostream& os, const Road& road) {
         os << road.dest->getName();
         return os;
     }
+
     void displayRoads(RenderWindow& window ,int x,int y,float angle){
         int direc=1;
         if(angle>=180)

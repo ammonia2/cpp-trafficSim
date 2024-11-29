@@ -26,8 +26,20 @@ class Vehicle {
     Vehicle(string n) : name(n) {}
     Vehicle(string n, Intersection* a, Intersection* b) : name(n), start(a), end(b) {}
 
-    void addPath(Road* r) {
+    void addRoad(Road* r) {
         route.push_back(r);
+    }
+
+    string getName() {
+        return name;
+    }
+
+    Intersection* getStart() {
+        return start;
+    }
+
+    Intersection* getEnd() {
+        return end;
     }
 };
 

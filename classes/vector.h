@@ -318,6 +318,12 @@ public:
         return data + sz;
     }
 
+    void display() {
+        for (int i=0; i<sz; i++) {
+            cout<<data[i]<<" ";
+        } cout<<endl;
+    }
+
 };
 
 

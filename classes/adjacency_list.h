@@ -153,6 +153,32 @@ class AdjacencyList {
         file.close();
     }
 
+    void initialiseVehicles() {
+        for (Vehicle* vehicle: vehicles) {
+            Vector<char> refs = dijkstraAlgo(vehicle->getStart(), vehicle->getEnd());
+            Vector<char> path = constructPath(refs, vehicle->getStart(), vehicle->getEnd());
+            path.display();
+            for (int i=0; i<path.size()-1; i++) {
+                char c = path[i];
+                char cNext= path[i+1];
+                Road* road = nullptr;
+                LinkedList<Road*>& edges = graph[c-'A'];
+                LinkedList<Road*>::Node* edge = edges.getHead();
+
+                while (edge) {
+                    if (edge->data->getDest() -> getName() == cNext) {
+                        road= edge->data;
+                        break;
+                    }
+                    edge = edge->next;
+                }
+
+                if (road)
+                    vehicle->addRoad(road);
+            }
+        }
+    }
+
     void initialiseGraph() {
         fstream network_file("files/road_network.csv", ios::in);
         fstream signals_file("files/traffic_signal_timings.csv", ios::in);
@@ -228,7 +254,7 @@ class AdjacencyList {
         loadSignalTimings(signals_file);
         loadVehicles(vehicles_file);
         loadEmergencyVehicles(EmergencyVehicles_file);
-
+        initialiseVehicles();
     }
 
     public:
@@ -298,7 +324,6 @@ class AdjacencyList {
         }
         reverse(path.begin(), path.end());
     
-        // If the start node is not in the path, it means there is no path
         if (path.empty() || path[0] != start->getName()) {
             path.clear();
         }
@@ -307,6 +332,10 @@ class AdjacencyList {
     }
 
     void aStarAlgo() {}
+
+    void updateSimulation() {
+        cout<<"meoew\n";
+    }
 
     void displayGraph(RenderWindow& window, int x,int y) {
         int i=0;

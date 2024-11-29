@@ -49,12 +49,24 @@ private:
 
     }
 
-    int hashFunction(K key) {
-
-        const double A = 0.6180339887; 
+    template <typename U = K>
+    typename std::enable_if<!std::is_same<U, std::string>::value, int>::type
+    hashFunction(const U& key) {
+        const double A = 0.6180339887;
         return static_cast<int>(capacity * (key * A - static_cast<int>(key * A)));
-
     }
+
+    // Specialized hash function for strings
+    template <typename U = K>
+    typename std::enable_if<std::is_same<U, std::string>::value, int>::type
+    hashFunction(const U& key) {
+        unsigned long hash = 5381;
+        for (char c : key) {
+            hash = ((hash << 5) + hash) + c; // hash * 33 + c
+        }
+        return hash % capacity;
+    }
+
 
     void resize() {
 
@@ -91,9 +103,9 @@ private:
 
 public:
 
-    HashTable(int cap = 10, float lf = 0.75) : size(0), loadFactor(lf) {
+    HashTable(int cap = 20, float lf = 0.75) : size(0), loadFactor(lf) {
 
-        capacity = nextPrime(cap); 
+        capacity = nextPrime(cap);
         table = new HashNode<K, V>*[capacity];
 
         for (int i = 0; i < capacity; i++) {
