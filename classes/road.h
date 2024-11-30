@@ -5,6 +5,7 @@
 #include "intersection.h"
 #include <iostream>
 #include "hashtable.h"
+#include "priority_queue.h"
 #include <cmath>
 using namespace std;
 using namespace sf;
@@ -15,18 +16,21 @@ class Vehicle;
 class Road {
     Intersection* dest;
     int travelTime; //weight
-    HashTable<string, Vehicle*> hashmap;
+    // HashTable<string, Vehicle*> hashmap;
+    PriorityQueue<Vehicle*> priority_Queue;
     string status;
 
     public:
-    Road(int time, Intersection* b): dest(b) {
+    Road(int time, Intersection* b): dest(b),status("clear") {
         travelTime = time;
     }
 
     void setStatus(string s) {
         status = s;
     }
-
+    string getStatus(){
+        return status;
+    }
     Intersection*& getDest() {
         return dest;
     }
@@ -36,11 +40,13 @@ class Road {
     }
 
     void insertVehicle(Vehicle* vehicle) {
-        hashmap.insert(vehicle->getName(), vehicle);
+        priority_Queue.push(vehicle);
+        // hashmap.insert(vehicle->getName(), vehicle);
     }
 
     void removeVehicle(Vehicle* vehicle) {
-        hashmap.remove(vehicle->getName());
+        priority_Queue.pop();
+        // hashmap.remove(vehicle->getName());
     }
 
     friend ostream& operator<<(ostream& os, const Road& road) {

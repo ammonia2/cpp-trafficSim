@@ -67,7 +67,6 @@ private:
         return hash % capacity;
     }
 
-
     void resize() {
 
         int oldCapacity = capacity;
@@ -143,7 +142,6 @@ public:
             resize(); 
 
         }
-
         int hashIndex = hashFunction(key);
         HashNode<K, V>* newNode = new HashNode<K, V>(key, value);
 
@@ -201,7 +199,25 @@ public:
         return V();
 
     }
+    bool find(K key){
+        int hashIndex = hashFunction(key);
+        HashNode<K, V>* current = table[hashIndex];
 
+        while (current) {
+
+            if (current->key == key) {
+
+                return true;
+
+            }
+
+            current = current->next;
+
+        }
+
+        // cout << "Key not found,Returning False!" << endl;
+        return false;
+    }
     void remove(K key) {
 
         int hashIndex = hashFunction(key);

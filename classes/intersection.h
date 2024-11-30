@@ -26,7 +26,6 @@ class Intersection {
     void setGreenTime(int t) {
         greenTime = t;
     }
-
     void addOutRoad(Road* r) {
         outRoads.push_back(r);
     }
