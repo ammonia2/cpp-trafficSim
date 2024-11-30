@@ -61,7 +61,6 @@ class AdjacencyList {
     Vector<Vehicle*> vehicles;
     Vector<EmergencyVehicle*> emergencyVehicles;
     HashTable<string, LinkedList<Vehicle*>*> roadVehicleMap;
-    LinkedList<string> keylist;
 
     void loadEmergencyVehicles(fstream& file) {
         string line;
@@ -192,7 +191,6 @@ class AdjacencyList {
                     roadVehicleMap.search(key)->insertAtStart(vehicle);
                 } 
                 else {
-                    keylist.insertAtEnd(key);
                     LinkedList<Vehicle*>* newList = new LinkedList<Vehicle*>();
                     newList->insertAtStart(vehicle);
                     roadVehicleMap.insert(key, newList);
@@ -362,6 +360,8 @@ class AdjacencyList {
 
         cout<<"meoew\n";
     }
+
+    //Displaying Road Status
     void display_Roads_Status(){
         for (Intersection* intsc : intersections) {
             LinkedList<Road*>& list = graph[intsc->getName()-'A'];
@@ -371,19 +371,30 @@ class AdjacencyList {
             }
         }
     }
+    
+    //Displaying Vehicles on each road
     void display_Vehicles_at_Roads(){
         cout<<"Congestion Status"<<endl;
-        LinkedList<string>::Node* node = keylist.getHead();
-        while(node){
-            LinkedList<Vehicle*>* temp_veh=roadVehicleMap.search(node->data);
-            LinkedList<Vehicle*>::Node* veh_head=temp_veh->getHead();
-            cout<<"Vehicles in Path "<<node->data[0]<<" to "<<node->data[1]<<" : ";
-            while(veh_head){
-                cout<<veh_head->data->getName()<<" ";
-                veh_head=veh_head->next;
+        for(Intersection* intsc : intersections){
+            char name=intsc->getName();
+            LinkedList<Road*>::Node* node=graph[name-'A'].getHead();
+            while(node){
+                string key="";
+                key+=name;
+                key+=node->data->getDest()->getName();
+                if(roadVehicleMap.find(key)){
+                    LinkedList<Vehicle*>* temp_veh=roadVehicleMap.search(key);
+                    LinkedList<Vehicle*>::Node* veh_head=temp_veh->getHead();
+                    cout<<"Vehicles in Path "<<key[0]<<" to "<<key[1]<<" are "<<temp_veh->getSize()<<" : ";
+                    while(veh_head){
+                        cout<<veh_head->data->getName()<<" ";
+                        veh_head=veh_head->next;
+                    }
+                    cout<<endl;
+                }
+                node=node->next;
+
             }
-            cout<<endl;
-            node=node->next;
         }
     }
     void displayGraph(RenderWindow& window, int x,int y) {
