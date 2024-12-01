@@ -23,8 +23,8 @@ class Vehicle {
     Intersection* start, *end;
 
     public:
-    Vehicle(string n) : name(n) {}
-    Vehicle(string n, Intersection* a, Intersection* b) : name(n), start(a), end(b) {}
+    Vehicle(string n) : name(n),currRoadIndex(0) {}
+    Vehicle(string n, Intersection* a, Intersection* b) : name(n), start(a), end(b),currRoadIndex(0) {}
 
     void addRoad(Road* r) {
         route.push_back(r);
@@ -40,6 +40,15 @@ class Vehicle {
 
     Intersection* getEnd() {
         return end;
+    }
+    Vector<Road*> getRoute() {
+        return route;
+    }
+    int getIndex(){
+        return currRoadIndex;
+    }
+    void moveIndex(){
+        currRoadIndex+=1;
     }
 };
 

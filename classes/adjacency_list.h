@@ -159,31 +159,31 @@ class AdjacencyList {
         for (Vehicle* vehicle: vehicles) {
             Vector<char> refs = dijkstraAlgo(vehicle->getStart(), vehicle->getEnd());
             Vector<char> path = constructPath(refs, vehicle->getStart(), vehicle->getEnd());
-            
+            //Added this IF 
             if(!path.empty()){
                 cout<<path.front()<<" to "<<path.back()<<" : ";
                 path.display();
-            }
-            for (int i=0; i<path.size()-1; i++) {
-                char c = path[i];
-                char cNext= path[i+1];
-                Road* road = nullptr;
-                LinkedList<Road*>& edges = graph[c-'A'];
-                LinkedList<Road*>::Node* edge = edges.getHead();
+                for (int i=0; i<path.size()-1; i++) {
+                    char c = path[i];
+                    char cNext= path[i+1];
+                    Road* road = nullptr;
+                    LinkedList<Road*>& edges = graph[c-'A'];
+                    LinkedList<Road*>::Node* edge = edges.getHead();
 
-                while (edge) {
-                    if (edge->data->getDest() -> getName() == cNext) {
-                        road= edge->data;
-                        break;
+                    while (edge) {
+                        if (edge->data->getDest() -> getName() == cNext) {
+                            road= edge->data;
+                            break;
+                        }
+                        edge = edge->next;
+                    // cout<<"yes"<<endl;
                     }
-                    edge = edge->next;
-                }
 
-                if (road){
-                    vehicle->addRoad(road);
+                    if (road){
+                        vehicle->addRoad(road);
+                    }
                 }
-            }
-            if(!path.empty()){
+                //Initializing HashMap of vehicles on roads
                 string key="";
                 key+=path[0];
                 key+=path[1];
@@ -313,7 +313,7 @@ class AdjacencyList {
             if (visited[minNodeName - 'A']) {
                 continue;
             }
-    
+            
             visited[minNodeName - 'A'] = true;
     
             LinkedList<Road*>& edges = graph[minNodeName - 'A'];
@@ -347,9 +347,9 @@ class AdjacencyList {
     
         if (path.empty() || path[0] != start->getName()) {
             path.clear();
-        }
-        if(path.empty()){
-            cout<<start->getName()<<" to "<<end->getName()<<" : Path not Found"<<endl;
+            if(path.empty()){
+                cout<<start->getName()<<" to "<<end->getName()<<" : Path not Found"<<endl;
+            }
         }
         return path;
     }
@@ -357,8 +357,76 @@ class AdjacencyList {
     void aStarAlgo() {}
 
     void updateSimulation() {
+        for(Vehicle* veh:vehicles){
+            // cout<<"yes\n";
+            cout<<veh->getName()<<endl;
+            // if(!veh->getRoute().empty()){  //This is the if condition when added program gives seg faults(my assumption is there are memory leaks somewhere)
 
-        cout<<"meoew\n";
+                Vector<Road*> route=veh->getRoute();
+                //Making key (can also add a var in vehicle class for current key)
+                string key="";
+                if(veh->getIndex()==0){
+                    key+=veh->getStart()->getName();
+                    // cout<<"no "<<veh->getIndex()<<endl;
+                    key+=route[veh->getIndex()]->getDest()->getName();
+                // cout<<"yes\n";
+                }
+                else{
+                    key+=route[veh->getIndex()-1]->getDest()->getName();
+                    key+=route[veh->getIndex()]->getDest()->getName();
+                }
+                //Updating road
+                veh->moveIndex();
+                cout<<veh->getName()<<endl;
+                cout<<"Key "<<key[0]<<" to "<<key[1]<<endl;
+                if(route[veh->getIndex()-1]->getDest()->getName()==veh->getEnd()->getName()){
+                    cout<<"Reached Destination"<<endl;
+                }
+                else{
+                    //Updating HashMap
+                    cout<<"current Road "<<route[veh->getIndex()-1]->getDest()->getName()<<" to "<<route[veh->getIndex()]->getDest()->getName();
+                    cout<<endl;
+                    roadVehicleMap.search(key)->removeByValue(veh);
+                    key="";
+                    key+=route[veh->getIndex()-1]->getDest()->getName();
+                    key+=route[veh->getIndex()]->getDest()->getName();
+                    cout<<"new Key "<<key[0]<<" to "<<key[1]<<endl;
+                    if (roadVehicleMap.find(key)) {
+                        roadVehicleMap.search(key)->insertAtStart(veh);
+                    } 
+                    else {
+                        LinkedList<Vehicle*>* newList = new LinkedList<Vehicle*>();
+                        newList->insertAtStart(veh);
+                        roadVehicleMap.insert(key, newList);
+                    }
+                    // roadVehicleMap.search(key)->insertAtEnd(veh);
+                }
+                //Removing the Key Value pair which is empty
+                for(Intersection* intsc : intersections){
+                    char name=intsc->getName();
+                    LinkedList<Road*>::Node* node=graph[name-'A'].getHead();
+                    while(node){
+                        string tempKey="";
+                        tempKey+=name;
+                        tempKey+=node->data->getDest()->getName();
+                        if(roadVehicleMap.find(tempKey)){
+                            if(roadVehicleMap.search(tempKey)->isEmpty()){
+                                roadVehicleMap.remove(tempKey);
+                            }
+                        }
+                        node=node->next;
+                        // cout<<tempKey<<endl;
+
+                    }
+                }
+            // }
+            // else{
+                // cout<<"No path Found\n";
+            // }
+        
+        }
+        //displaying HashMap
+        display_Vehicles_at_Roads();
     }
 
     //Displaying Road Status
@@ -399,12 +467,12 @@ class AdjacencyList {
     }
     void displayGraph(RenderWindow& window, int x,int y) {
         int i=0;
-        cout<<"City Graph System"<<endl;
-        for (Intersection* intsc : intersections) {
-            char name = intsc->getName();
-            cout<<name<<": ";
-            graph[name-'A'].printList();
-            // if(!graph[name- 'A'].isEmpty()){
+        // cout<<"City Graph System"<<endl;
+        // for (Intersection* intsc : intersections) {
+        //     char name = intsc->getName();
+        //     cout<<name<<": ";
+        //     graph[name-'A'].printList();
+        //     // if(!graph[name- 'A'].isEmpty()){
             //     int index = 0;
             //     float angleStep=360/(graph[name- 'A'].getSize()+1);
             //     // float angleStep=90;
@@ -433,8 +501,22 @@ class AdjacencyList {
             // x+=50;
             // y+=50;
             
-        }
-        display_Roads_Status();
+        // }
+        // display_Roads_Status();
         display_Vehicles_at_Roads();
+        // for(Vehicle* veh:vehicles){
+        //     Vector<Road*> route=veh->getRoute();
+        //     cout<<veh->getStart()->getName()<<" ";
+        //     for(Road* rd: route){
+        //         cout<<rd->getDest()->getName()<<" ";
+        //     }
+        //     route.pop_back();
+        //     cout<<endl<<"After Popping Back\n";
+        //     cout<<veh->getStart()->getName()<<" ";
+        //     for(Road* rd: route){
+        //         cout<<rd->getDest()->getName()<<" ";
+        //     }
+        //     cout<<endl;
+        // }
     }
 };

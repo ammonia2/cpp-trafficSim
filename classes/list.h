@@ -229,6 +229,30 @@ public:
         }
 
     }
+    
+    void removeByValue(T value) {
+        if (isEmpty()) {
+            // cout << "List is empty!" << endl;
+            return;
+        }
+        if (head->data == value) {
+            removeAtStart();
+            return;
+        }
+        Node* current = head;
+        Node* prev = nullptr;
+        while (current && current->data != value) {
+            prev = current;
+            current = current->next;
+        }
+        if (!current) {
+            // cout << "Value not found in the list!" << endl;
+            return;
+        }
+        prev->next = current->next;
+        delete current;
+        size--;
+    }
 
     bool isEmpty() const {
 
