@@ -359,30 +359,31 @@ class AdjacencyList {
     void updateSimulation() {
         for(Vehicle* veh:vehicles){
             // cout<<"yes\n";
-            cout<<veh->getName()<<endl;
-            // if(!veh->getRoute().empty()){  //This is the if condition when added program gives seg faults(my assumption is there are memory leaks somewhere)
+            // cout<<veh->getName()<<endl;
+            if(!veh->getRoute().empty()){  //This is the if condition when added program gives seg faults(my assumption is there are memory leaks somewhere)
 
                 Vector<Road*> route=veh->getRoute();
-                //Making key (can also add a var in vehicle class for current key)
-                string key="";
-                if(veh->getIndex()==0){
-                    key+=veh->getStart()->getName();
-                    // cout<<"no "<<veh->getIndex()<<endl;
-                    key+=route[veh->getIndex()]->getDest()->getName();
-                // cout<<"yes\n";
-                }
-                else{
-                    key+=route[veh->getIndex()-1]->getDest()->getName();
-                    key+=route[veh->getIndex()]->getDest()->getName();
-                }
-                //Updating road
-                veh->moveIndex();
-                cout<<veh->getName()<<endl;
-                cout<<"Key "<<key[0]<<" to "<<key[1]<<endl;
-                if(route[veh->getIndex()-1]->getDest()->getName()==veh->getEnd()->getName()){
+                if(route[veh->getIndex()]->getDest()->getName()==veh->getEnd()->getName()){
                     cout<<"Reached Destination"<<endl;
                 }
                 else{
+                    //Making key (can also add a var in vehicle class for current key)
+                    string key="";
+                    if(veh->getIndex()==0){
+                        key+=veh->getStart()->getName();
+                        // cout<<"no "<<veh->getIndex()<<endl;
+                        key+=route[veh->getIndex()]->getDest()->getName();
+                    // cout<<"yes\n";
+                    }
+                    else{
+                        cout<<"yes\n";
+                        key+=route[veh->getIndex()-1]->getDest()->getName();
+                        key+=route[veh->getIndex()]->getDest()->getName();
+                    }
+                    //Updating road
+                    veh->moveIndex();
+                    cout<<veh->getName()<<endl;
+                    cout<<"Key "<<key[0]<<" to "<<key[1]<<endl;
                     //Updating HashMap
                     cout<<"current Road "<<route[veh->getIndex()-1]->getDest()->getName()<<" to "<<route[veh->getIndex()]->getDest()->getName();
                     cout<<endl;
@@ -419,10 +420,10 @@ class AdjacencyList {
 
                     }
                 }
-            // }
-            // else{
-                // cout<<"No path Found\n";
-            // }
+            }
+            else{
+                cout<<"No path Found\n";
+            }
         
         }
         //displaying HashMap

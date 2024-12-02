@@ -204,11 +204,13 @@ public:
 
     }
 
-    void clear() { // clear the contents of the vector
-
+    void clear() {
+        delete[] data;
+        data = nullptr;
         sz = 0;
-
+        cap = 0;
     }
+
 
     void reserve(int newCap) { // allocate an amount of memory to the vector
 
