@@ -32,7 +32,6 @@
 *.app
 
 # Also Executables
-*.
 app
 exe
 main
