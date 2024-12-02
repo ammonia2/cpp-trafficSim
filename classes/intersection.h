@@ -3,7 +3,6 @@
 #include <SFML/Graphics.hpp>
 #include <iostream>
 #include "vector.h"
-#include "road.h"
 #include "traffic_signal.h"
 using namespace std;
 using namespace sf;
@@ -19,35 +18,42 @@ class Intersection {
     int x,y;
 
     public:
-    Intersection (char n):x(0),y(0) {
+    Intersection (char n): x(0), y(0) {
         name =n;
     }
 
     void setGreenTime(int t) {
         greenTime = t;
     }
-    void addOutRoad(Road* r) {
-        outRoads.push_back(r);
-    }
+
+    void addOutRoad(Road* r);
+
+    void addInRoad(Road* r);
+
     void set_X(int a){
         x=a;
     }
+
     void set_Y(int a){
         y=a;
     }
+
     int get_X(){
         return x;
     }
+
     int get_Y(){
         return y;
-    }
-    void addInRoad(Road* r) {
-        inRoads.push_back(r);
     }
 
     char getName() const {
         return name;
     }
+
+    void calculateSignalTimings();
+
+    void updateSignals();
+
     void displayIntersection(RenderWindow& window,int x, int y){
         CircleShape circle(15);
         circle.setFillColor(Color::Green);

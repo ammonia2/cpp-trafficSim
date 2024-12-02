@@ -2,7 +2,6 @@
 
 #include <SFML/Graphics.hpp>
 #include "vehicle.h"
-#include "intersection.h"
 #include <iostream>
 #include "hashtable.h"
 #include "priority_queue.h"
@@ -12,27 +11,37 @@ using namespace sf;
 
 
 class Vehicle;
+class Intersection;
 
 class Road {
     Intersection* dest;
     int travelTime; //weight
-    // HashTable<string, Vehicle*> hashmap;
     PriorityQueue<Vehicle*> priority_Queue;
     string status;
 
     public:
-    Road(int time, Intersection* b): dest(b),status("clear") {
+    Road(int time, Intersection* b): dest(b), status("Clear") {
         travelTime = time;
     }
 
     void setStatus(string s) {
         status = s;
     }
+    
     string getStatus(){
         return status;
     }
+
     Intersection*& getDest() {
         return dest;
+    }
+
+    int getTrafficLoad() {
+        return priority_Queue.getSize();
+    }
+
+    int getCapacity() const {
+        return 1.0 / travelTime;
     }
 
     int getWeight() {
@@ -41,12 +50,10 @@ class Road {
 
     void insertVehicle(Vehicle* vehicle) {
         priority_Queue.push(vehicle);
-        // hashmap.insert(vehicle->getName(), vehicle);
     }
 
     void removeVehicle(Vehicle* vehicle) {
         priority_Queue.pop();
-        // hashmap.remove(vehicle->getName());
     }
 
     friend ostream& operator<<(ostream& os, const Road& road) {

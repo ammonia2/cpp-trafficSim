@@ -21,10 +21,11 @@ class Vehicle {
     int currRoadIndex; // will change as road changes
     Coord position;
     Intersection* start, *end;
+    bool atDest;
 
     public:
-    Vehicle(string n) : name(n),currRoadIndex(0) {}
-    Vehicle(string n, Intersection* a, Intersection* b) : name(n), start(a), end(b),currRoadIndex(0) {}
+    Vehicle(string n) : name(n), currRoadIndex(0), atDest(false) {}
+    Vehicle(string n, Intersection* a, Intersection* b) : name(n), start(a), end(b), currRoadIndex(0), atDest(false) {}
 
     void addRoad(Road* r) {
         route.push_back(r);
@@ -41,14 +42,25 @@ class Vehicle {
     Intersection* getEnd() {
         return end;
     }
+
     Vector<Road*> getRoute() {
         return route;
     }
+
     int getIndex(){
         return currRoadIndex;
     }
-    void moveIndex(){
+    
+    void moveIndex() {
         currRoadIndex+=1;
+    }
+
+    void setAtDest(bool arg) {
+        atDest = true;
+    }
+
+    bool getAtDest() {
+        return atDest;
     }
 };
 

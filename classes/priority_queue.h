@@ -152,7 +152,7 @@ public:
 
     }
 
-    bool isEmpty() {
+    bool isEmpty() const {
 
         return size == 0;
 

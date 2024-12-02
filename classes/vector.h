@@ -33,6 +33,27 @@ public:
 
     Vector() : data(nullptr), sz(0), cap(0) {}
 
+    Vector(const Vector& other) : sz(other.sz), cap(other.cap) {
+        data = new T[cap];
+        for (int i = 0; i < sz; ++i) {
+            data[i] = other.data[i];
+        }
+    }
+
+    // Copy assignment operator
+    Vector& operator=(const Vector& other) {
+        if (this != &other) {
+            delete[] data;
+            sz = other.sz;
+            cap = other.cap;
+            data = new T[cap];
+            for (int i = 0; i < sz; ++i) {
+                data[i] = other.data[i];
+            }
+        }
+        return *this;
+    }
+
     ~Vector() {
 
         delete[] data;
@@ -58,7 +79,7 @@ public:
     }
 
     // Note: 
-    //dummy used to handle error cases where index is out of range by returning a referencable object.
+    // dummy used to handle error cases where index is out of range by returning a referencable object.
     // const functions are the same as the functions defined above them with the difference that the 
     // vector object is not modified in them, useful for const vector objects.
 
@@ -190,7 +211,6 @@ public:
 
     }
 
-
     void pop_back() { // remove element from end of vector
 
         if (empty()) {
@@ -210,7 +230,6 @@ public:
         sz = 0;
         cap = 0;
     }
-
 
     void reserve(int newCap) { // allocate an amount of memory to the vector
 
@@ -327,5 +346,3 @@ public:
     }
 
 };
-
-
