@@ -2,6 +2,7 @@
 
 #include <SFML/Graphics.hpp>
 #include "vehicle.h"
+#include "intersection.h"
 #include <iostream>
 #include "hashtable.h"
 #include "priority_queue.h"
@@ -32,6 +33,10 @@ class Road {
         return status;
     }
 
+    Vehicle* getHeapTop() {
+        return priority_Queue.top();
+    }
+
     Intersection*& getDest() {
         return dest;
     }
@@ -52,7 +57,7 @@ class Road {
         priority_Queue.push(vehicle);
     }
 
-    void removeVehicle(Vehicle* vehicle) {
+    void removeVehicle() {
         priority_Queue.pop();
     }
 

@@ -202,6 +202,7 @@ class AdjacencyList {
                     }
                 }
 
+                vehicle->setRoad();
                 //Initializing HashMap of vehicles on roads
                 string key="";
                 key+=path[0];
@@ -215,6 +216,7 @@ class AdjacencyList {
                     roadVehicleMap.insert(key, newList);
                 }
             }
+
         }
     }
 
@@ -381,6 +383,7 @@ class AdjacencyList {
     }
 
     void updateSimulation() {
+        Vector<Vehicle*> atRoadEnd;
         for(Vehicle* veh: vehicles) {
             if( !veh->getRoute().empty() && !veh->getAtDest() ) {
 
@@ -398,28 +401,30 @@ class AdjacencyList {
                         key+=route[veh->getIndex()]->getDest()->getName();
                     }
                     else {
-                        key+=route[veh->getIndex()-1]->getDest()->getName();
+                        key+=route[veh->getIndex() - 1]->getDest()->getName();
                         key+=route[veh->getIndex()]->getDest()->getName();
                     }
 
                     //Updating road
-                    veh->moveIndex();
+                    // veh->moveIndex();
+                    veh->updateTime();
+                    if (veh->getTime() == 0) atRoadEnd.push_back(veh);
 
                     cout<<veh->getName()<<endl;
                     cout<<"Key "<<key[0]<<" to "<<key[1]<<endl;
 
-                    cout<<"current Road "<<route[veh->getIndex()-1]->getDest()->getName()<<" to "<<route[veh->getIndex()]->getDest()->getName();
+                    cout<<"current Road "<<route[veh->getIndex() - 1]->getDest()->getName()<<" to "<<route[veh->getIndex()]->getDest()->getName();
                     cout<<endl;
 
                     // Updating HashMap
                     roadVehicleMap.search(key)->removeByValue(veh);
                     key="";
-                    key+=route[veh->getIndex()-1]->getDest()->getName();
+                    key+=route[veh->getIndex() - 1]->getDest()->getName();
                     key+=route[veh->getIndex()]->getDest()->getName();
 
                     if (roadVehicleMap.find(key)) {
                         roadVehicleMap.search(key)->insertAtStart(veh);
-                    } 
+                    }
                     else {
                         LinkedList<Vehicle*>* newList = new LinkedList<Vehicle*>();
                         newList->insertAtStart(veh);
@@ -428,10 +433,25 @@ class AdjacencyList {
                 }
 
             }
-            else{
+            else {
                 // cout<<"No path Found\n";
             }
         
+        }
+
+        Vector<Road*> doneRoads;
+
+        for (Vehicle* veh: atRoadEnd) {
+            Road* road = veh->getRoute()[veh->getIndex()];
+            
+            if (doneRoads.contains(road)) continue;
+
+            if (road->getDest()->signalActive(road)) {
+                Vehicle* top = road->getHeapTop();
+                doneRoads.push_back(road);
+                top->moveIndex();
+                road->removeVehicle();
+            }
         }
         
         for (Intersection* intsc: intersections) {
@@ -541,7 +561,6 @@ class AdjacencyList {
 };
 
 
-// clear route after getting to dest
 // display all possible paths between intersections with weights.
 // signals
 // emergency vehicle integration

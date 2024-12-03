@@ -60,6 +60,13 @@ public:
 
     }
 
+    bool contains(T d) {
+        for (int i=0; i<sz; i++) {
+            if (data[i] == d) return true;
+        }
+        return false;
+    }
+
     int size() const { // return size of vector
 
         return sz;

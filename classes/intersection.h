@@ -54,6 +54,15 @@ class Intersection {
 
     void updateSignals();
 
+    bool signalActive(Road* road) {
+        for (int i=0; i<inRoads.size(); i++ ) {
+            if (inRoads[i] == road) {
+                return signals[i].getState() == "GREEN";
+            }
+        }
+        return false;
+    }
+
     void displayIntersection(RenderWindow& window,int x, int y){
         CircleShape circle(15);
         circle.setFillColor(Color::Green);

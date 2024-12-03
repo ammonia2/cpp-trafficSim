@@ -1,4 +1,4 @@
-// g++ main.cpp classes/intersection.cpp -o app -lsfml-graphics -lsfml-window -lsfml-system && ./app
+// g++ main.cpp classes/intersection.cpp classes/vehicle.cpp -o app -lsfml-graphics -lsfml-window -lsfml-system && ./app
 
 #include <SFML/Graphics.hpp>
 #include <iostream>

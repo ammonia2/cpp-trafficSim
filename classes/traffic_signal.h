@@ -38,7 +38,7 @@ class TrafficSignal {
 
     void update() {
         if (currentState == "GREEN") {
-            currentTime--;
+            if (currentTime>0) currentTime--;
             if (currentTime <= 0 && yellow != 0) {
                 currentState = "YELLOW";
                 currentTime = yellow;
@@ -47,13 +47,13 @@ class TrafficSignal {
                 currentTime = green;
             }
         } else if (currentState == "YELLOW") {
-            currentTime--;
+            if (currentTime>0) currentTime--;
             if (currentTime <= 0) {
                 currentState = "RED";
                 currentTime = red;
             }
         } else if (currentState == "RED") {
-            currentTime--;
+            if (currentTime>0) currentTime--;
             if (currentTime <= 0) {
                 currentState = "GREEN";
                 currentTime = green;

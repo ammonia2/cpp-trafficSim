@@ -3,7 +3,6 @@
 #include "road.h"
 #include <SFML/Graphics.hpp>
 #include <iostream>
-#include "vector.h"
 #include "intersection.h"
 using namespace std;
 
@@ -24,11 +23,14 @@ class Vehicle {
     Intersection* start, *end;
     bool atDest;
     int priorityLevel;
+    int travelTime;
 
     public:
     Vehicle(string n) : name(n), currRoadIndex(0), atDest(false) {}
 
     Vehicle(string n, Intersection* a, Intersection* b) : name(n), start(a), end(b), currRoadIndex(0), atDest(false) {}
+
+    void setRoad();
 
     void addRoad(Road* r) {
         route.push_back(r);
@@ -40,6 +42,14 @@ class Vehicle {
 
     string getName() {
         return name;
+    }
+
+    int getTime() {
+        return travelTime;
+    }
+
+    void updateTime() {
+        if (travelTime>0) travelTime--;
     }
 
     Intersection* getStart() {
@@ -58,9 +68,7 @@ class Vehicle {
         return currRoadIndex;
     }
     
-    void moveIndex() {
-        currRoadIndex+=1;
-    }
+    void moveIndex();
 
     void setAtDest(bool arg) {
         atDest = true;
@@ -75,12 +83,10 @@ class Vehicle {
     }
 
     bool operator<(const Vehicle& other) const {
-        cout<<"<<<<<<<<<<<<<<<Miseter > called>>>>>>>>>>>>>>>\n";
         return this->priorityLevel < other.priorityLevel;
     }
 
     bool operator>(const Vehicle& other) const {
-        cout<<"<<<<<<<<<<<<<<<Miseter > called>>>>>>>>>>>>>>>\n";
         return this->priorityLevel > other.priorityLevel;
     }
 
@@ -96,7 +102,7 @@ class Vehicle {
         return this->priorityLevel == other.priorityLevel;
     }
 
-    virtual ~Vehicle() {} // Virtual destructor for polymorphism
+    virtual ~Vehicle() {}
 };
 
 class EmergencyVehicle : public Vehicle { // dynamic routing

@@ -1,6 +1,7 @@
 #pragma once
 
 #include <iostream>
+#include <type_traits>
 using namespace std;
 
 class Vehicle;
@@ -17,8 +18,14 @@ private:
     bool isMinHeap;
 
     bool compare(T a, T b) const {
-        return isMinHeap ? (a < b) : (a > b);
+        if constexpr (std::is_base_of<Vehicle, std::remove_pointer_t<T>>::value) {
+            return isMinHeap ? (*a < *b) : (*a > *b);
+        } 
+        else {
+            return isMinHeap ? (a < b) : (a > b);
+        }
     }
+
 
     void heapifyUp(int index) {
 
@@ -186,9 +193,3 @@ public:
     }
     
 };
-
-template <>
-inline bool PriorityQueue<Vehicle*>::compare(Vehicle* a, Vehicle* b) const {
-    cout<<"Called<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<,,,\n";
-    return isMinHeap ? (*a < *b) : (*a > *b);
-}
