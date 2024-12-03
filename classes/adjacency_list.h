@@ -392,7 +392,7 @@ class AdjacencyList {
                 else {
                     //Making key (can also add a var in vehicle class for current key)
                     string key="";
-                    if(veh->getIndex()==0){
+                    if(veh->getIndex()==0) {
                         key+=veh->getStart()->getName();
                         // cout<<"no "<<veh->getIndex()<<endl;
                         key+=route[veh->getIndex()]->getDest()->getName();

@@ -24,6 +24,14 @@ class TrafficSignal {
         red = r;
     }
 
+    void setYellowTime(int y) {
+        yellow = y;
+    }
+
+    void setCurrentTime(int c) {
+        currentTime = c;
+    }
+
     int getRedTime() {
         return red;
     }
@@ -31,9 +39,12 @@ class TrafficSignal {
     void update() {
         if (currentState == "GREEN") {
             currentTime--;
-            if (currentTime <= 0) {
+            if (currentTime <= 0 && yellow != 0) {
                 currentState = "YELLOW";
                 currentTime = yellow;
+            }
+            else if (currentTime <= 0) {
+                currentTime = green;
             }
         } else if (currentState == "YELLOW") {
             currentTime--;
@@ -54,7 +65,15 @@ class TrafficSignal {
         currentState =s;
     }
 
-    void resetTime() {}
+    void resetTime() {
+        if (currentState == "GREEN") {
+            currentTime = green;
+        } else if (currentState == "YELLOW") {
+            currentTime = yellow;
+        } else if (currentState == "RED") {
+            currentTime = red;
+        }
+    }
 
     string getState() const {
         return currentState;

@@ -3,8 +3,10 @@
 #include <iostream>
 using namespace std;
 
-template <typename T>
+class Vehicle;
 
+
+template <typename T>
 class PriorityQueue {
 
 private:
@@ -185,3 +187,8 @@ public:
     
 };
 
+template <>
+inline bool PriorityQueue<Vehicle*>::compare(Vehicle* a, Vehicle* b) const {
+    cout<<"Called<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<,,,\n";
+    return isMinHeap ? (*a < *b) : (*a > *b);
+}

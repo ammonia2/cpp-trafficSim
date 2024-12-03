@@ -16,19 +16,26 @@ struct Coord {
 };
 
 class Vehicle {
+    protected:
     string name;
     Vector<Road*> route;
     int currRoadIndex; // will change as road changes
     Coord position;
     Intersection* start, *end;
     bool atDest;
+    int priorityLevel;
 
     public:
     Vehicle(string n) : name(n), currRoadIndex(0), atDest(false) {}
+
     Vehicle(string n, Intersection* a, Intersection* b) : name(n), start(a), end(b), currRoadIndex(0), atDest(false) {}
 
     void addRoad(Road* r) {
         route.push_back(r);
+    }
+
+    void setPriorityLevel(int p) {
+        priorityLevel = p;
     }
 
     string getName() {
@@ -62,13 +69,54 @@ class Vehicle {
     bool getAtDest() {
         return atDest;
     }
+
+    int getPriorityLevel() {
+        return priorityLevel;
+    }
+
+    bool operator<(const Vehicle& other) const {
+        cout<<"<<<<<<<<<<<<<<<Miseter > called>>>>>>>>>>>>>>>\n";
+        return this->priorityLevel < other.priorityLevel;
+    }
+
+    bool operator>(const Vehicle& other) const {
+        cout<<"<<<<<<<<<<<<<<<Miseter > called>>>>>>>>>>>>>>>\n";
+        return this->priorityLevel > other.priorityLevel;
+    }
+
+    bool operator<=(const Vehicle& other) const {
+        return this->priorityLevel <= other.priorityLevel;
+    }
+
+    bool operator>=(const Vehicle& other) const {
+        return this->priorityLevel >= other.priorityLevel;
+    }
+
+    bool operator==(const Vehicle& other) const {
+        return this->priorityLevel == other.priorityLevel;
+    }
+
+    virtual ~Vehicle() {} // Virtual destructor for polymorphism
 };
 
 class EmergencyVehicle : public Vehicle { // dynamic routing
     string priority;
 
     public:
-    EmergencyVehicle(string n, string p) : Vehicle(n), priority(p) {}
-    EmergencyVehicle(string n, Intersection* a, Intersection* b , string p) : Vehicle(n, a, b), priority(p) {}
-};
+    EmergencyVehicle(string n, string p) : Vehicle(n), priority(p) {
+        setPriorityLevel();
+    }
 
+    EmergencyVehicle(string n, Intersection* a, Intersection* b , string p) : Vehicle(n, a, b), priority(p) {
+        setPriorityLevel();
+    }
+
+    void setPriorityLevel() {
+        if (priority=="High")
+            priorityLevel = 69;
+        else if (priority=="Medium")
+            priorityLevel = 20;
+        else if (priority=="Low")
+            priorityLevel = 10;
+    }
+};
