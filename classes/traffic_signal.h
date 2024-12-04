@@ -17,6 +17,7 @@ class TrafficSignal {
     }
 
     void setGreenTime(int g) {
+
         green = g;
     }
 
@@ -73,6 +74,10 @@ class TrafficSignal {
         } else if (currentState == "RED") {
             currentTime = red;
         }
+    }
+
+    int getGreenTime() const {
+        return green;
     }
 
     string getState() const {

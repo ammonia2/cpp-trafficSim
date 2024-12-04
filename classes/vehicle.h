@@ -83,23 +83,28 @@ class Vehicle {
     }
 
     bool operator<(const Vehicle& other) const {
-        return this->priorityLevel < other.priorityLevel;
+        // return this->priorityLevel < other.priorityLevel && this->travelTime==0;
+        return this->travelTime < other.travelTime;
     }
 
     bool operator>(const Vehicle& other) const {
-        return this->priorityLevel > other.priorityLevel;
+        // return this->priorityLevel > other.priorityLevel && this->travelTime==0;
+        return this->travelTime > other.travelTime;
     }
 
     bool operator<=(const Vehicle& other) const {
-        return this->priorityLevel <= other.priorityLevel;
+        // return this->priorityLevel <= other.priorityLevel && this->travelTime==0;
+        return this->travelTime <= other.travelTime;
     }
 
     bool operator>=(const Vehicle& other) const {
-        return this->priorityLevel >= other.priorityLevel;
+        // return this->priorityLevel >= other.priorityLevel && this->travelTime==0;
+        return this->travelTime >= other.travelTime;
     }
 
     bool operator==(const Vehicle& other) const {
-        return this->priorityLevel == other.priorityLevel;
+        // return this->priorityLevel == other.priorityLevel && this->travelTime==0;
+        return this->travelTime == other.travelTime;
     }
 
     virtual ~Vehicle() {}

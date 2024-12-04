@@ -128,6 +128,10 @@ public:
 
     }
 
+    void deleteValue(T value) {
+        
+    }
+
     void pop() {
 
         if (isEmpty()) {

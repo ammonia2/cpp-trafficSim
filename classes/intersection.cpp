@@ -24,9 +24,10 @@ void Intersection::calculateSignalTimings() {
         TrafficSignal signal(greenTime, 0);
         signal.setYellowTime(0);
         signal.setState("GREEN");
+        signal.resetTime();
         signals.push_back(signal);
-        // cout << "Signal for road to " << road->getDest()->getName()
-        //      << " set to GREEN: " << greenTime << " seconds, RED: 0 seconds." << endl;
+        cout << "Signal for road to " << road->getDest()->getName()
+             << " set to GREEN: " << signal.getGreenTime() << " seconds, RED: 0 seconds." << endl;
     }
     else {
         for (int i = 0; i < inRoads.size(); ++i) {
@@ -53,9 +54,11 @@ void Intersection::calculateSignalTimings() {
 void Intersection::updateSignals() {
     for (TrafficSignal& signal : signals) {
         signal.update();
+        cout <<name<<"  T: "<< signal.getTimeRemaining()<<" Green Time: "<<signal.getGreenTime()<<". ";
+        
     }
 
-    for (int i = 0; i < signals.size(); ++i) {
-        cout <<name<<"  T: "<< signals[i].getTimeRemaining()<<" ";
-    }
+    // for (int i = 0; i < signals.size(); ++i) {
+    //     cout <<name<<"  T: "<< signals[i].getTimeRemaining()<<" Green Time: "<<signals[i].getGreenTime()<<". ";
+    // }
 }

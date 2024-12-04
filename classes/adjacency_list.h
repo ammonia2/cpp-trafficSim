@@ -240,6 +240,10 @@ class AdjacencyList {
             getline(ss, start, ',');
             getline(ss, end, ',');
             getline(ss, weight, ',');
+
+            if (!weight.empty() && weight.back() == '\r') {
+                weight.pop_back();
+            }
         
             char startNode = start[0];
             char endNode = end[0];
@@ -387,11 +391,16 @@ class AdjacencyList {
         Vector<Road*> doneRoads;
 
         for(Vehicle* veh: vehicles) {
+            if(veh->getName()=="V7"){
+                    cout<<"debug: "<<veh->getIndex()<<endl;
+            }
             if( !veh->getRoute().empty() && !veh->getAtDest() ) {
-
+                if(veh->getName()=="V7"){
+                    cout<<"debug: "<<veh->getIndex()<<endl;
+                }
                 Vector<Road*> route = veh->getRoute();
-                    cout<<veh->getName()<<endl;
-                    // cout<<"route size: "<<route.size()<<" current index: "<<veh->getIndex()<<endl;
+                cout<<veh->getName()<<endl;
+                cout<<"route size: "<<route.size()<<" current index: "<<veh->getIndex()<<" Time: "<<veh->getTime()<<endl;
                 if (route.size()==veh->getIndex() && veh->getTime() <= 1) {
                     cout<<"Reached Destination"<<endl;
                     veh->setAtDest(true);
@@ -400,7 +409,6 @@ class AdjacencyList {
                     //Making key (can also add a var in vehicle class for current key)
                     string key="";
                     int temp_idx=veh->getIndex();
-                    // cout<<"index: "<<veh->getIndex()<<endl;
                     if(veh->getIndex()==0) {
                         // cout<<"Index 0\n";
                         key+=veh->getStart()->getName();
@@ -410,13 +418,13 @@ class AdjacencyList {
                     }
                     else {
                         // cout<<"index not 0\n";
+                        // cout<<"index: "<<veh->getIndex()<<endl;
                         key+=route[veh->getIndex() - 1]->getDest()->getName();
                         key+=route[veh->getIndex()]->getDest()->getName();
-                        // cout<<"generatssed key\n";
+                        cout<<"generatssed key\n";
                     }
 
                     //Updating road
-                    // veh->moveIndex();
                     veh->updateTime();
                     cout<<"time updated\n";
                     Road* road = veh->getRoute()[veh->getIndex()];
@@ -424,25 +432,26 @@ class AdjacencyList {
                     if (veh->getTime() == 0) atRoadEnd.push_back(veh);
 
                     if (!doneRoads.contains(road)) {
-
                         if ( veh->getTime()==0 && road->getDest()->signalActive(road)) {
-                            cout<<"i2 dun\n";
+                            // cout<<"i2 dun\n";
                             Vehicle* top = road->getHeapTop();
                             doneRoads.push_back(road);
+                            cout<<"Trying to remove: s"<<veh->getName()<<endl;
                             cout<<"moving\n";
                             top->moveIndex();
-                            cout<<"i3 dun\n";
+                            cout<<"moved\n";
                             road->removeVehicle();
                         }
                     }
-                    cout<<"i dun\n";
+                    // cout<<"i dun\n";
 
                     cout<<"Key "<<key[0]<<" to "<<key[1]<<" TIME : "<<veh->getTime()<<endl;
 
                     // Updating HashMap
+                    cout<<veh->getName()<<endl;
                     cout<<"prev: "<<temp_idx<<"  Updated: "<<veh->getIndex()<<endl;
                     if(veh->getIndex()!=temp_idx && route.size()!=veh->getIndex()){
-                        cout<<"entered\n";
+                        // cout<<"entered\n";
                         cout<<"current Road "<<route[veh->getIndex()-1]->getDest()->getName()<<" to "<<route[veh->getIndex()]->getDest()->getName();
                         roadVehicleMap.search(key)->removeByValue(veh);
                         cout<<veh->getName()<<"  Previous key: "<<key<<"  ";
@@ -460,28 +469,24 @@ class AdjacencyList {
                         }
                     }
                 }
+                if(veh->getName()=="V7"){
+                    cout<<"debug: "<<veh->getIndex()<<endl;
+                }
+
 
             }
             else {
                 // cout<<"No path Found\n";
             }
+            if(veh->getName()=="V7"){
+                    cout<<"debug: "<<veh->getIndex()<<endl;
+            }
         
         }
 
-
-        // for (Vehicle* veh: atRoadEnd) {
-        //     Road* road = veh->getRoute()[veh->getIndex()];
-            
-        //     if (doneRoads.contains(road)) continue;
-
-        //     if (road->getDest()->signalActive(road)) {
-        //         Vehicle* top = road->getHeapTop();
-        //         doneRoads.push_back(road);
-        //         top->moveIndex();
-        //         road->removeVehicle();
-        //     }
-        // }
-        
+        for(Vehicle* veh: vehicles){
+            cout<<veh->getName()<<" "<<veh->getIndex()<<endl;
+        }
         for (Intersection* intsc: intersections) {
             intsc->updateSignals();
         }

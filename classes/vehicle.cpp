@@ -2,11 +2,15 @@
 #include "vector.h"
 
 void Vehicle::moveIndex() {
-    cout<<"adding currRoad\n";
-    currRoadIndex+=1;
-    cout<<"added currRoad\n";
-    setRoad();
-    cout<<"calling sets\n";
+    if(getName()=="V7"){
+    }
+    // if(getTime()==0){
+        cout<<"adding currRoad\n";
+        currRoadIndex+=1;
+        cout<<"added currRoad\n";
+        setRoad();
+        cout<<"calling sets\n";
+    // }
 }
 
 void Vehicle::setRoad() {
