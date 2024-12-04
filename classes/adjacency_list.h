@@ -468,7 +468,7 @@ class AdjacencyList {
                     // Adjust travel time for congestion
                     int travelTime = road->getWeight() + road->getTrafficLoad();
 
-                    int tempDistance = distance[minNodeName - 'A'] + travelTime; // g(n)
+                    int tempDistance = distance[minNodeName - 'A'] + travelTime; 
 
                     if (tempDistance < distance[neighbour->getName() - 'A']) {
                         distance[neighbour->getName() - 'A'] = tempDistance;
