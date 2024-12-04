@@ -127,7 +127,7 @@ class TrafficManagement{ // to be completed by Hasaan the artist 😘💕🙌
 };
 
 int main() {
-    RenderWindow window(VideoMode(1280, 720), "SFML Basic Example");
+    // RenderWindow window(VideoMode(1280, 720), "SFML Basic Example");
     // while (window.isOpen()) {
     //     Event event;
     //     while (window.pollEvent(event)) {
@@ -144,7 +144,7 @@ int main() {
     // graph.displayGraph();
     TrafficManagement obj;
 
-    obj.management(window);
+    // obj.management(window);
 
     obj.startSimulation();
 }

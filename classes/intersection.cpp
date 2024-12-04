@@ -55,8 +55,7 @@ void Intersection::updateSignals() {
         signal.update();
     }
 
-    cout << "\nIntersection: " << name << endl;
     for (int i = 0; i < signals.size(); ++i) {
-        cout << "Signal " << i << ": " << signals[i].getState() << ". Time: "<< signals[i].getTimeRemaining() << endl;
+        cout <<name<<"  T: "<< signals[i].getTimeRemaining()<<" ";
     }
 }

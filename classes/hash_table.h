@@ -254,7 +254,7 @@ public:
         cout << "Key not found, nothing to remove!" << endl;
 
     }
-
+    
     void display() {
 
         for (int i = 0; i < capacity; i++) {
