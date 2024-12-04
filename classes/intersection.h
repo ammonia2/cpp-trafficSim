@@ -38,6 +38,8 @@ class Intersection {
         y=a;
     }
 
+    string getSignal(Road* road);
+    
     int get_X(){
         return x;
     }
@@ -57,6 +59,7 @@ class Intersection {
     bool signalActive(Road* road) {
         for (int i=0; i<inRoads.size(); i++ ) {
             if (inRoads[i] == road) {
+                // cout<<signals[i].getState()<<"\n";
                 return signals[i].getState() == "GREEN";
             }
         }

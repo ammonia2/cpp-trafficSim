@@ -21,7 +21,7 @@ class Road {
     string status;
 
     public:
-    Road(int time, Intersection* b): dest(b), status("Clear") {
+    Road(int time, Intersection* b): dest(b), status("Clear"), priority_Queue(false) {
         travelTime = time;
     }
 

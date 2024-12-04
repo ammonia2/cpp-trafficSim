@@ -26,9 +26,9 @@ class Vehicle {
     int travelTime;
 
     public:
-    Vehicle(string n) : name(n), currRoadIndex(0), atDest(false) {}
+    Vehicle(string n, int p=0) : name(n), currRoadIndex(0), atDest(false), priorityLevel(p) {}
 
-    Vehicle(string n, Intersection* a, Intersection* b) : name(n), start(a), end(b), currRoadIndex(0), atDest(false) {}
+    Vehicle(string n, Intersection* a, Intersection* b, int p=0) : name(n), start(a), end(b), currRoadIndex(0), atDest(false), priorityLevel(p) {}
 
     void setRoad();
 
@@ -83,28 +83,30 @@ class Vehicle {
     }
 
     bool operator<(const Vehicle& other) const {
-        // return this->priorityLevel < other.priorityLevel && this->travelTime==0;
-        return this->travelTime < other.travelTime;
+        // if (this->priorityLevel != other.priorityLevel) {
+        //     return this->priorityLevel < other.priorityLevel;
+        // }
+        return this->travelTime > other.travelTime && this->priorityLevel <= other.priorityLevel;
     }
 
     bool operator>(const Vehicle& other) const {
-        // return this->priorityLevel > other.priorityLevel && this->travelTime==0;
-        return this->travelTime > other.travelTime;
+        // if (this->priorityLevel != other.priorityLevel) {
+        //     return this->priorityLevel > other.priorityLevel;
+        // }
+        return this->travelTime < other.travelTime && this->priorityLevel >= other.priorityLevel;
     }
 
     bool operator<=(const Vehicle& other) const {
-        // return this->priorityLevel <= other.priorityLevel && this->travelTime==0;
-        return this->travelTime <= other.travelTime;
+        return !(*this > other);
     }
 
     bool operator>=(const Vehicle& other) const {
-        // return this->priorityLevel >= other.priorityLevel && this->travelTime==0;
-        return this->travelTime >= other.travelTime;
+        return !(*this < other);
     }
 
     bool operator==(const Vehicle& other) const {
-        // return this->priorityLevel == other.priorityLevel && this->travelTime==0;
-        return this->travelTime == other.travelTime;
+        return this->priorityLevel == other.priorityLevel &&
+            this->travelTime == other.travelTime;
     }
 
     virtual ~Vehicle() {}

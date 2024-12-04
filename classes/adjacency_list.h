@@ -172,7 +172,14 @@ class AdjacencyList {
         file.close();
     }
 
-    void initialiseEmergencyVehicles() {}
+    void initialiseEmergencyVehicles() {
+
+        for (EmergencyVehicle* vehicle: emergencyVehicles) {
+            Vector<char> refs = aStarAlgo(vehicle->getStart(), vehicle->getEnd());
+            refs.display();
+        }
+        
+    }
 
     void initialiseVehicles() {
         for (Vehicle* vehicle: vehicles) {
@@ -298,6 +305,7 @@ class AdjacencyList {
         loadVehicles(vehicles_file);
         loadEmergencyVehicles(EmergencyVehicles_file);
         initialiseVehicles();
+        initialiseEmergencyVehicles();
 
         // initialise signal timings
         for (Intersection* intsc: intersections) {
@@ -375,86 +383,177 @@ class AdjacencyList {
     
         if (path.empty() || path[0] != start->getName()) {
             path.clear();
-            if(path.empty()){
+            // if(path.empty()) {
                 // cout<<start->getName()<<" to "<<end->getName()<<" : Path not Found"<<endl;
-            }
+            // }
         }
         return path;
     }
 
-    void aStarAlgo() { // for emergency vehicle routing
-    
+    // exact way to measure heuristic is to calculate the travelTime from the edge to the ending edge. 
+    // (could also require checking congestion (secondary weight))
+
+    Vector<char> aStarAlgo(Intersection* start, Intersection* end) {
+
+        // Initialize vectors and priority queue
+        Vector<int> distance; // g(n): cost to reach the node
+        Vector<int> heuristic; // h(n): estimated cost to goal
+        Vector<char> previousReferences; // Tracks the path
+        Vector<bool> visited;
+        PriorityQueue<DistanceNode> pq(true, intersections.size()); // Min-heap
+
+        distance.resize(intersections.size());
+        heuristic.resize(intersections.size());
+        previousReferences.resize(intersections.size());
+        visited.resize(intersections.size());
+
+        for (int i = 0; i < visited.size(); i++) {
+            visited[i] = false;
+            distance[i] = INT_MAX;
+            previousReferences[i] = '\0';
+            heuristic[i] = 0; // Default heuristic
+        }
+
+        // Heuristic: travelTime of roads connected to the goal
+        for (Intersection* intsc : intersections) {
+            
+            char name = intsc->getName();
+            LinkedList<Road*>& edges = graph[name - 'A'];
+            LinkedList<Road*>::Node* edge = edges.getHead();
+
+            int minTravelTime = INT_MAX;
+            
+            while (edge) {
+                Road* road = edge->data;
+                if (road->getStatus() == "Clear") {
+                    int travelTime = road->getWeight() + road->getTrafficLoad(); // Adjusted for congestion
+                    if (travelTime < minTravelTime) {
+                        minTravelTime = travelTime;
+                    }
+                }
+                edge = edge->next;
+            }
+            heuristic[name - 'A'] = (minTravelTime == INT_MAX) ? 0 : minTravelTime;
+        }
+
+        // Initialize the starting node
+        distance[start->getName() - 'A'] = 0;
+        pq.push(DistanceNode(start, heuristic[start->getName() - 'A'])); // f(n) = g(n) + h(n)
+
+        // Main A* loop
+        while (!pq.isEmpty()) {
+            DistanceNode minNode = pq.top();
+            pq.pop();
+
+            Intersection* minIntersection = minNode.intersection;
+            char minNodeName = minIntersection->getName();
+
+            if (visited[minNodeName - 'A'])
+                continue;
+
+            visited[minNodeName - 'A'] = true;
+
+            // Stop early if the goal is reached
+            if (minIntersection == end)
+                break;
+
+            LinkedList<Road*>& edges = graph[minNodeName - 'A'];
+            LinkedList<Road*>::Node* edge = edges.getHead();
+
+            while (edge) {
+                Road* road = edge->data;
+                if (road->getStatus() == "Clear") {
+                    Intersection* neighbour = road->getDest();
+                    
+                    // Adjust travel time for congestion
+                    int travelTime = road->getWeight() + road->getTrafficLoad();
+
+                    int tempDistance = distance[minNodeName - 'A'] + travelTime; // g(n)
+
+                    if (tempDistance < distance[neighbour->getName() - 'A']) {
+                        distance[neighbour->getName() - 'A'] = tempDistance;
+                        previousReferences[neighbour->getName() - 'A'] = minNodeName;
+
+                        // Calculate f(n) = g(n) + h(n)
+                        int priority = tempDistance + heuristic[neighbour->getName() - 'A'];
+                        pq.push(DistanceNode(neighbour, priority));
+                    }
+                }
+                edge = edge->next;
+            }
+        }
+
+        return previousReferences;
     }
+
 
     void updateSimulation() {
         Vector<Vehicle*> atRoadEnd;
         Vector<Road*> doneRoads;
 
         for(Vehicle* veh: vehicles) {
-            if(veh->getName()=="V7"){
-                    cout<<"debug: "<<veh->getIndex()<<endl;
-            }
             if( !veh->getRoute().empty() && !veh->getAtDest() ) {
-                if(veh->getName()=="V7"){
-                    cout<<"debug: "<<veh->getIndex()<<endl;
-                }
+                
                 Vector<Road*> route = veh->getRoute();
                 cout<<veh->getName()<<endl;
                 cout<<"route size: "<<route.size()<<" current index: "<<veh->getIndex()<<" Time: "<<veh->getTime()<<endl;
-                if (route.size()==veh->getIndex() && veh->getTime() <= 1) {
+                if (route.size()==veh->getIndex() && veh->getTime() <= 0) {
                     cout<<"Reached Destination"<<endl;
                     veh->setAtDest(true);
                 }
+
                 else {
                     //Making key (can also add a var in vehicle class for current key)
-                    string key="";
-                    int temp_idx=veh->getIndex();
-                    if(veh->getIndex()==0) {
-                        // cout<<"Index 0\n";
-                        key+=veh->getStart()->getName();
-                        // cout<<"no "<<veh->getIndex()<<endl;
-                        key+=route[veh->getIndex()]->getDest()->getName();
-                        // cout<<"generated key\n";
-                    }
-                    else {
-                        // cout<<"index not 0\n";
-                        // cout<<"index: "<<veh->getIndex()<<endl;
-                        key+=route[veh->getIndex() - 1]->getDest()->getName();
-                        key+=route[veh->getIndex()]->getDest()->getName();
-                        cout<<"generatssed key\n";
-                    }
+                    string key="69";
 
                     //Updating road
                     veh->updateTime();
-                    cout<<"time updated\n";
                     Road* road = veh->getRoute()[veh->getIndex()];
             
                     if (veh->getTime() == 0) atRoadEnd.push_back(veh);
+                    int temp_idx=veh->getIndex();
 
                     if (!doneRoads.contains(road)) {
                         if ( veh->getTime()==0 && road->getDest()->signalActive(road)) {
-                            // cout<<"i2 dun\n";
-                            Vehicle* top = road->getHeapTop();
+                            veh = road->getHeapTop();
+                            route = veh->getRoute();
+                            temp_idx=veh->getIndex();
+                            key="";
+                            if(veh->getIndex()==0) {
+                                key+=veh->getStart()->getName();
+                                key+=route[veh->getIndex()]->getDest()->getName();
+                            }
+                            else {
+                                key+=route[veh->getIndex() - 1]->getDest()->getName();
+                                key+=route[veh->getIndex()]->getDest()->getName();
+                            }
+                            
+                            // if (veh->getName()=="V17")
+                            // cout<<"Veh: "<<veh->getName()<<" Top: "<<top->getName()<<endl;
+
                             doneRoads.push_back(road);
-                            cout<<"Trying to remove: s"<<veh->getName()<<endl;
-                            cout<<"moving\n";
-                            top->moveIndex();
-                            cout<<"moved\n";
+                            veh->moveIndex();
+                            // if(veh->getName()=="V17") {
+                            //     cout<<"pp: "<<temp_idx<<" now: "<<veh->getIndex()<<endl;
+                            // }
                             road->removeVehicle();
                         }
                     }
-                    // cout<<"i dun\n";
 
                     cout<<"Key "<<key[0]<<" to "<<key[1]<<" TIME : "<<veh->getTime()<<endl;
 
                     // Updating HashMap
                     cout<<veh->getName()<<endl;
                     cout<<"prev: "<<temp_idx<<"  Updated: "<<veh->getIndex()<<endl;
-                    if(veh->getIndex()!=temp_idx && route.size()!=veh->getIndex()){
-                        // cout<<"entered\n";
+
+                    // FINDING NEXT ROAD
+                    if( veh->getIndex()>temp_idx && route.size()!=veh->getIndex() ) {
                         cout<<"current Road "<<route[veh->getIndex()-1]->getDest()->getName()<<" to "<<route[veh->getIndex()]->getDest()->getName();
+                        
+                        cout<<" veh: "<<veh->getName()<<" key: "<<key<<endl;
                         roadVehicleMap.search(key)->removeByValue(veh);
                         cout<<veh->getName()<<"  Previous key: "<<key<<"  ";
+
                         key="";
                         key+=route[veh->getIndex() - 1]->getDest()->getName();
                         key+=route[veh->getIndex()]->getDest()->getName();
@@ -469,24 +568,24 @@ class AdjacencyList {
                         }
                     }
                 }
-                if(veh->getName()=="V7"){
-                    cout<<"debug: "<<veh->getIndex()<<endl;
-                }
+                // if(veh->getName()=="V7"){
+                //     cout<<"debug: "<<veh->getIndex()<<endl;
+                // }
 
 
             }
             else {
                 // cout<<"No path Found\n";
             }
-            if(veh->getName()=="V7"){
-                    cout<<"debug: "<<veh->getIndex()<<endl;
-            }
+            // if(veh->getName()=="V7"){
+            //         cout<<"debug: "<<veh->getIndex()<<endl;
+            // }
         
         }
 
-        for(Vehicle* veh: vehicles){
-            cout<<veh->getName()<<" "<<veh->getIndex()<<endl;
-        }
+        // for(Vehicle* veh: vehicles){
+        //     cout<<veh->getName()<<" "<<veh->getIndex()<<endl;
+        // }
         for (Intersection* intsc: intersections) {
             intsc->updateSignals();
         }
@@ -533,11 +632,10 @@ class AdjacencyList {
                     }
 
                     veh_head= temp_veh->getHead();
-
-                    cout<<"Vehicles in Path "<<key[0]<<" to "<<key[1]<<" are "<<temp_veh->getSize()<<" : ";
+                    cout<<"Signal: "<<node->data->getDest()->getSignal(node->data)<<" Vehicles in Path "<<key[0]<<" to "<<key[1]<<" are "<<temp_veh->getSize()<<" : ";
                     
                     while (veh_head) {
-                        cout<<veh_head->data->getName()<<" ";
+                        cout<<veh_head->data->getName()<<" ( " << veh_head->data->getPriorityLevel() << ", "<< veh_head->data->getTime() << " ) ";
                         veh_head = veh_head->next;
                     }
                     cout<<endl;

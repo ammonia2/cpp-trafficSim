@@ -9,6 +9,16 @@ void Intersection::addInRoad(Road* r) {
     inRoads.push_back(r);
 }
 
+string Intersection:: getSignal(Road* road){
+    for (int i=0; i<inRoads.size(); i++ ) {
+        
+        if (inRoads[i] == road) {
+            return signals[i].getState();
+        }
+    }
+    return "false";
+}
+
 void Intersection::calculateSignalTimings() {
     if (inRoads.size() == 0) {
         cout << "Intersection " << name << " has no incoming roads!" << endl;
@@ -26,8 +36,8 @@ void Intersection::calculateSignalTimings() {
         signal.setState("GREEN");
         signal.resetTime();
         signals.push_back(signal);
-        cout << "Signal for road to " << road->getDest()->getName()
-             << " set to GREEN: " << signal.getGreenTime() << " seconds, RED: 0 seconds." << endl;
+        // cout << "Signal for road to " << road->getDest()->getName()
+        //      << " set to GREEN: " << signal.getGreenTime() << " seconds, RED: 0 seconds." << endl;
     }
     else {
         for (int i = 0; i < inRoads.size(); ++i) {
@@ -54,11 +64,5 @@ void Intersection::calculateSignalTimings() {
 void Intersection::updateSignals() {
     for (TrafficSignal& signal : signals) {
         signal.update();
-        cout <<name<<"  T: "<< signal.getTimeRemaining()<<" Green Time: "<<signal.getGreenTime()<<". ";
-        
     }
-
-    // for (int i = 0; i < signals.size(); ++i) {
-    //     cout <<name<<"  T: "<< signals[i].getTimeRemaining()<<" Green Time: "<<signals[i].getGreenTime()<<". ";
-    // }
 }
