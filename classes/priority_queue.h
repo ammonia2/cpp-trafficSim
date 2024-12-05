@@ -84,23 +84,58 @@ private:
     }
 
     void resize() {
-
         int newCapacity = capacity * 2;
         T* newHeap = new T[newCapacity];
-
+        
         for (int i = 0; i < size; i++) {
-
-            newHeap[i] = heap[i];
-
+            if constexpr (std::is_pointer<T>::value) {
+                // For pointer types, create new objects if needed
+                newHeap[i] = heap[i]; // Assumes ownership management is handled elsewhere
+            } else {
+                newHeap[i] = heap[i];
+            }
         }
-
+        
         delete[] heap;
         heap = newHeap;
         capacity = newCapacity;
-
     }
 
 public:
+    PriorityQueue(const PriorityQueue& other) {
+        capacity = other.capacity;
+        size = other.size;
+        isMinHeap = other.isMinHeap;
+        heap = new T[capacity];
+        
+        for (int i = 0; i < size; i++) {
+            if constexpr (std::is_pointer<T>::value) {
+                // Deep copy if needed
+                heap[i] = other.heap[i]; // Assumes ownership management is handled elsewhere
+            } else {
+                heap[i] = other.heap[i];
+            }
+        }
+    }
+
+    PriorityQueue& operator=(const PriorityQueue& other) {
+        if (this != &other) {
+            delete[] heap;
+            capacity = other.capacity;
+            size = other.size;
+            isMinHeap = other.isMinHeap;
+            heap = new T[capacity];
+            
+            for (int i = 0; i < size; i++) {
+                if constexpr (std::is_pointer<T>::value) {
+                    heap[i] = other.heap[i]; // Assumes ownership management is handled elsewhere
+                } else {
+                    heap[i] = other.heap[i];
+                }
+            }
+        }
+        return *this;
+    }
 
     PriorityQueue(bool minHeap = true, int initialCapacity = 10): isMinHeap(minHeap), capacity(initialCapacity), size(0) {
 
@@ -129,7 +164,30 @@ public:
     }
 
     void deleteValue(T value) {
+        int index = -1;
+        for (int i = 0; i < size; i++) {
+            if constexpr (std::is_pointer<T>::value) {
+                if (*heap[i] == *value) {
+                    index = i;
+                    break;
+                }
+            } else {
+                if (heap[i] == value) {
+                    index = i;
+                    break;
+                }
+            }
+        }
         
+        if (index == -1) return;
+        
+        heap[index] = heap[size - 1];
+        size--;
+        
+        if (index < size) {
+            heapifyDown(index);
+            heapifyUp(index);
+        }
     }
 
     void pop() {

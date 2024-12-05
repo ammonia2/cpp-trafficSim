@@ -2,7 +2,7 @@
 #include "vector.h"
 
 void Vehicle::moveIndex() {
-    if (name == "V17")
+    if (name == "EV18")
         cout<<"\n\nname\n"<<endl;
 
     currRoadIndex+=1;

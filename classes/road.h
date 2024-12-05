@@ -61,6 +61,12 @@ class Road {
         priority_Queue.pop();
     }
 
+    void displayQ() {
+        cout<<"YO\n";
+        cout<<"Q size: "<<priority_Queue.getSize()<<endl;
+        priority_Queue.display();
+    }
+
     friend ostream& operator<<(ostream& os, const Road& road) {
         os << road.dest->getName();
         return os;

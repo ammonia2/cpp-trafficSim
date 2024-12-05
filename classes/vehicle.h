@@ -83,15 +83,15 @@ class Vehicle {
     }
 
     bool operator<(const Vehicle& other) const {
-        // if (this->priorityLevel != other.priorityLevel) {
-        //     return this->priorityLevel < other.priorityLevel;
+        // if (this->travelTime == other.travelTime) {
+        //     return this->priorityLevel <= other.priorityLevel;
         // }
         return this->travelTime > other.travelTime && this->priorityLevel <= other.priorityLevel;
     }
 
     bool operator>(const Vehicle& other) const {
-        // if (this->priorityLevel != other.priorityLevel) {
-        //     return this->priorityLevel > other.priorityLevel;
+        // if (this->travelTime == other.travelTime) {
+        //     return this->priorityLevel >= other.priorityLevel;
         // }
         return this->travelTime < other.travelTime && this->priorityLevel >= other.priorityLevel;
     }
@@ -107,6 +107,11 @@ class Vehicle {
     bool operator==(const Vehicle& other) const {
         return this->priorityLevel == other.priorityLevel &&
             this->travelTime == other.travelTime;
+    }
+
+    friend ostream& operator<< (ostream& os, Vehicle* obj) {
+        os<<obj->getName()<<" ";
+        return os;
     }
 
     virtual ~Vehicle() {}
