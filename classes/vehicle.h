@@ -82,18 +82,31 @@ class Vehicle {
         return priorityLevel;
     }
 
+    // bool operator<(const Vehicle& other) const {
+    //     // if (this->travelTime == other.travelTime) {
+    //     //     return this->priorityLevel <= other.priorityLevel;
+    //     // }
+    //     return this->travelTime >= other.travelTime && this->priorityLevel <= other.priorityLevel;
+    // }
+
+    // bool operator>(const Vehicle& other) const {
+    //     // if (this->travelTime == other.travelTime) {
+    //     //     return this->priorityLevel >= other.priorityLevel;
+    //     // }
+    //     return this->travelTime <= other.travelTime && this->priorityLevel >= other.priorityLevel;
+    // }
     bool operator<(const Vehicle& other) const {
-        // if (this->travelTime == other.travelTime) {
-        //     return this->priorityLevel <= other.priorityLevel;
-        // }
-        return this->travelTime > other.travelTime && this->priorityLevel <= other.priorityLevel;
+        if (this->travelTime == other.travelTime) {
+            return this->priorityLevel < other.priorityLevel;
+        }
+        return this->travelTime > other.travelTime;
     }
 
     bool operator>(const Vehicle& other) const {
-        // if (this->travelTime == other.travelTime) {
-        //     return this->priorityLevel >= other.priorityLevel;
-        // }
-        return this->travelTime < other.travelTime && this->priorityLevel >= other.priorityLevel;
+        if (this->travelTime == other.travelTime) {
+            return this->priorityLevel > other.priorityLevel;
+        }
+        return this->travelTime < other.travelTime;
     }
 
     bool operator<=(const Vehicle& other) const {

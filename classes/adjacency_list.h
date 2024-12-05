@@ -537,7 +537,7 @@ class AdjacencyList {
                 Vector<Road*> route = veh->getRoute();
                 cout<<veh->getName()<<endl;
                 cout<<"route size: "<<route.size()<<" current index: "<<veh->getIndex()<<" Time: "<<veh->getTime()<<endl;
-                if (route.size()==veh->getIndex() && veh->getTime() <= 0) {
+                if (route.size()==veh->getIndex() && veh->getTime() <= 1) {
                     cout<<"Reached Destination"<<endl;
                     veh->setAtDest(true);
                 }
@@ -557,11 +557,15 @@ class AdjacencyList {
                     int temp_idx=veh->getIndex();
                     if (!doneRoads.contains(road)) {
                         if ( veh->getTime()==0 && road->getDest()->signalActive(road)) {
-                            cout<<"Vehhi "<<veh->getName()<<" time: "<<veh->getTime()<<endl;
-                            cout<<"\n\nPQ: ";
-                            road->displayQ();
-                            cout<<"\n\n";
+                            // cout<<"Vehhi "<<veh->getName()<<" time: "<<veh->getTime()<<endl;
+                            // cout<<"\n\nPQ: ";
+                            // road->displayQ();
+                            // cout<<"\n\n";
                             veh = road->getHeapTop();
+                            // if (veh == nullptr) {
+                            //     cout << "Error: No vehicle found at the top of the heap!\n\n\n\n\n\n\n\n\n\n";
+                            //     continue;  // Skip this iteration
+                            // }
                             route = veh->getRoute();
                             temp_idx=veh->getIndex();
                             key="";
@@ -667,7 +671,7 @@ class AdjacencyList {
                     }
 
                     veh_head= temp_veh->getHead();
-                    cout<<"Signal: "<<node->data->getDest()->getSignal(node->data)<<" Vehicles in Path "<<key[0]<<" to "<<key[1]<<" are "<<temp_veh->getSize()<<" : ";
+                    cout<<"Signal: "<<node->data->getDest()->getSignal(node->data)<<" Time: "<<node->data->getDest()->getSignalTime(node->data)<<" Vehicles in Path "<<key[0]<<" to "<<key[1]<<" are "<<temp_veh->getSize()<<" : ";
                     
                     while (veh_head) {
                         cout<<veh_head->data->getName()<<" ( " << veh_head->data->getPriorityLevel() << ", "<< veh_head->data->getTime() << " ) ";
