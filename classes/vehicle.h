@@ -67,6 +67,14 @@ class Vehicle {
     int getIndex(){
         return currRoadIndex;
     }
+
+    void clearRoute() {
+        route.clear();
+    }
+
+    void setIndex(int i) {
+        currRoadIndex = i;
+    }
     
     void moveIndex();
 
