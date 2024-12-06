@@ -604,7 +604,7 @@ class AdjacencyList {
                             }
                         }
                     }
-
+                }
 
                 else {
                     if(veh->getName()=="EV3"){
