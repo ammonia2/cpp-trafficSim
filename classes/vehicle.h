@@ -34,6 +34,8 @@ class Vehicle {
 
     void addRoad(Road* r) {
         route.push_back(r);
+        // cout<<"New routing: ";r->displayQ();
+        // cout<<endl;
     }
 
     void setPriorityLevel(int p) {
@@ -46,6 +48,10 @@ class Vehicle {
 
     int getTime() {
         return travelTime;
+    }
+
+    void setTime(int t) {
+        travelTime= t;
     }
 
     void updateTime() {
@@ -67,6 +73,14 @@ class Vehicle {
     int getIndex(){
         return currRoadIndex;
     }
+
+    void clearRoute() {
+        route.clear();
+    }
+
+    void setIndex(int i) {
+        currRoadIndex = i;
+    }
     
     void moveIndex();
 
@@ -82,19 +96,10 @@ class Vehicle {
         return priorityLevel;
     }
 
-    // bool operator<(const Vehicle& other) const {
-    //     // if (this->travelTime == other.travelTime) {
-    //     //     return this->priorityLevel <= other.priorityLevel;
-    //     // }
-    //     return this->travelTime >= other.travelTime && this->priorityLevel <= other.priorityLevel;
-    // }
+    virtual void setOld(char o) {}
 
-    // bool operator>(const Vehicle& other) const {
-    //     // if (this->travelTime == other.travelTime) {
-    //     //     return this->priorityLevel >= other.priorityLevel;
-    //     // }
-    //     return this->travelTime <= other.travelTime && this->priorityLevel >= other.priorityLevel;
-    // }
+    virtual char getOld() {}
+
     bool operator<(const Vehicle& other) const {
         if (this->travelTime == other.travelTime) {
             return this->priorityLevel < other.priorityLevel;
@@ -132,6 +137,7 @@ class Vehicle {
 
 class EmergencyVehicle : public Vehicle { // dynamic routing
     string priority;
+    char old;
 
     public:
     EmergencyVehicle(string n, string p) : Vehicle(n), priority(p) {
@@ -140,6 +146,13 @@ class EmergencyVehicle : public Vehicle { // dynamic routing
 
     EmergencyVehicle(string n, Intersection* a, Intersection* b , string p) : Vehicle(n, a, b), priority(p) {
         setPriorityLevel();
+    }
+
+    void setOld(char o) override {
+        old = o;
+    }
+    char getOld() override {
+        return old;
     }
 
     void setPriorityLevel() {
