@@ -201,6 +201,7 @@ class AdjacencyList {
                 if (road) {
                     vehicle->addRoad(road);
                     vehicle->setRoad();
+                    vehicle->setOld(vehicle->getStart()->getName());
                     
                     // Add to roadVehicleMap
                     string key = "";
@@ -528,14 +529,21 @@ class AdjacencyList {
 
         Vector<Vehicle*> atRoadEnd;
         Vector<Road*> doneRoads;
+        
 
         for(Vehicle* veh: vehicles) {
+            
             if( !veh->getRoute().empty() && !veh->getAtDest() ) {
                 Vector<Road*> route = veh->getRoute();
                 cout<<veh->getName()<<endl;
                 cout<<"route size: "<<route.size()<<" current index: "<<veh->getIndex()<<" Time: "<<veh->getTime()<<endl;
-                if (route.size()==veh->getIndex() && veh->getTime() <= 0) {
+
+
+                if (route.size()==veh->getIndex() && veh->getTime() <= 1 ) {
                     Intersection* currentIntersection =  route[veh->getIndex() - 1]->getDest();
+                    if (veh->getName()[0] == 'E') {
+                        cout<<endl<<endl<<currentIntersection->getName()<<" "<<veh->getEnd()->getName()<<endl<<endl;
+                    }
 
                     if(currentIntersection->getName() == veh->getEnd()->getName()) {
                         cout << "Reached Destination" << endl;
@@ -543,16 +551,25 @@ class AdjacencyList {
                     }
                     else {
                         // Need to find next path
+                        cout<<"\n\nev bad\n";
+                        string oldKey="";
+                        oldKey+=veh->getOld();
+                        oldKey+=currentIntersection->getName();
+
                         Vector<char> refs = aStarAlgo(currentIntersection, veh->getEnd());
                         Vector<char> newPath = constructPath(refs, currentIntersection, veh->getEnd());
+                        cout<<"New Path "; newPath.display();
                         
                         if(!newPath.empty() && newPath.size() > 1) {
                             char currentNode = newPath[0];
                             char nextNode = newPath[1];
                             Road* nextRoad = nullptr;
+
+                            roadVehicleMap.search(oldKey)->removeByValue(veh);
                             
                             LinkedList<Road*>& edges = graph[currentNode - 'A'];
                             LinkedList<Road*>::Node* edge = edges.getHead();
+                            
                             while(edge) {
                                 if(edge->data->getDest()->getName() == nextNode && 
                                 edge->data->getStatus() == "Clear") {
@@ -565,8 +582,12 @@ class AdjacencyList {
                             if(nextRoad) {
                                 veh->clearRoute();
                                 veh->addRoad(nextRoad);
-                                veh->setIndex(0);
+                                veh->setTime(nextRoad->getWeight());
+                                veh->setIndex(1);
+
+                                veh->setOld(currentIntersection->getName());
                                 route = veh->getRoute();
+                                route.display();
 
                                 // Update hashmap
                                 string newKey = "";
@@ -586,6 +607,9 @@ class AdjacencyList {
                 }
 
                 else {
+                    if(veh->getName()=="EV3"){
+                        cout<<veh->getTime()<<" "<<veh->getIndex()<<endl;
+                    }
                     //Making key (can also add a var in vehicle class for current key)
                     string key="69";
 
@@ -594,13 +618,17 @@ class AdjacencyList {
                     // cout<<veh->getIndex()<<" "<<veh->getRoute().size()<<endl;
                     Road* road = veh->getRoute()[veh->getIndex()];
             
-                    if (veh->getTime() == 0) 
+                    if (veh->getTime() == 0) {
+                        // doneRoads.clear();
                         atRoadEnd.push_back(veh);
+                    }
                     
                     int temp_idx=veh->getIndex();
                     if (!doneRoads.contains(road)) {
                         if ( veh->getTime()==0 && road->getDest()->signalActive(road)) {
+                            cout<<"Im here\n";
                             veh = road->getHeapTop();
+                            cout<<"Im here\n";
                             route = veh->getRoute();
                             temp_idx=veh->getIndex();
                             key="";

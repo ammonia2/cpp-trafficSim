@@ -34,6 +34,8 @@ class Vehicle {
 
     void addRoad(Road* r) {
         route.push_back(r);
+        // cout<<"New routing: ";r->displayQ();
+        // cout<<endl;
     }
 
     void setPriorityLevel(int p) {
@@ -46,6 +48,10 @@ class Vehicle {
 
     int getTime() {
         return travelTime;
+    }
+
+    void setTime(int t) {
+        travelTime= t;
     }
 
     void updateTime() {
@@ -90,6 +96,12 @@ class Vehicle {
         return priorityLevel;
     }
 
+    virtual void setOld(char o) {}
+
+    virtual char getOld() {
+        
+    }
+
     bool operator<(const Vehicle& other) const {
         // if (this->travelTime == other.travelTime) {
         //     return this->priorityLevel <= other.priorityLevel;
@@ -127,6 +139,7 @@ class Vehicle {
 
 class EmergencyVehicle : public Vehicle { // dynamic routing
     string priority;
+    char old;
 
     public:
     EmergencyVehicle(string n, string p) : Vehicle(n), priority(p) {
@@ -135,6 +148,13 @@ class EmergencyVehicle : public Vehicle { // dynamic routing
 
     EmergencyVehicle(string n, Intersection* a, Intersection* b , string p) : Vehicle(n, a, b), priority(p) {
         setPriorityLevel();
+    }
+
+    void setOld(char o) override {
+        old = o;
+    }
+    char getOld() override {
+        return old;
     }
 
     void setPriorityLevel() {
