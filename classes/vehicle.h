@@ -34,8 +34,6 @@ class Vehicle {
 
     void addRoad(Road* r) {
         route.push_back(r);
-        // cout<<"New routing: ";r->displayQ();
-        // cout<<endl;
     }
 
     void setPriorityLevel(int p) {

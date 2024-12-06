@@ -21,7 +21,6 @@ string Intersection:: getSignal(Road* road){
 
 void Intersection::calculateSignalTimings() {
     if (inRoads.size() == 0) {
-        cout << "Intersection " << name << " has no incoming roads!" << endl;
         return;
     }
 
@@ -36,8 +35,6 @@ void Intersection::calculateSignalTimings() {
         signal.setState("GREEN");
         signal.resetTime();
         signals.push_back(signal);
-        // cout << "Signal for road to " << road->getDest()->getName()
-        //      << " set to GREEN: " << signal.getGreenTime() << " seconds, RED: 0 seconds." << endl;
     }
     else {
         for (int i = 0; i < inRoads.size(); ++i) {
