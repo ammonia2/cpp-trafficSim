@@ -98,22 +98,20 @@ class Vehicle {
 
     virtual void setOld(char o) {}
 
-    virtual char getOld() {
-        
-    }
+    virtual char getOld() {}
 
     bool operator<(const Vehicle& other) const {
-        // if (this->travelTime == other.travelTime) {
-        //     return this->priorityLevel <= other.priorityLevel;
-        // }
-        return this->travelTime > other.travelTime && this->priorityLevel <= other.priorityLevel;
+        if (this->travelTime == other.travelTime) {
+            return this->priorityLevel < other.priorityLevel;
+        }
+        return this->travelTime > other.travelTime;
     }
 
     bool operator>(const Vehicle& other) const {
-        // if (this->travelTime == other.travelTime) {
-        //     return this->priorityLevel >= other.priorityLevel;
-        // }
-        return this->travelTime < other.travelTime && this->priorityLevel >= other.priorityLevel;
+        if (this->travelTime == other.travelTime) {
+            return this->priorityLevel > other.priorityLevel;
+        }
+        return this->travelTime < other.travelTime;
     }
 
     bool operator<=(const Vehicle& other) const {
