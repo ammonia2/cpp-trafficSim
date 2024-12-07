@@ -74,19 +74,23 @@ class TrafficManagement{
 
     public:
 
-    void startSimulation() {
+    void startSimulation(int duration=-1) {
+        int time=0;
         static auto lastUpdate = chrono::steady_clock::now();
-
+        graph.setSimultaionBool(true);
         while (true) {
             auto now = chrono::steady_clock::now();
-
             if (chrono::duration_cast<chrono::seconds>(now - lastUpdate).count() >= 1) { // 1sec
                 graph.updateSimulation();
                 lastUpdate = now;
+                time+=1;
             }
-
+        
             this_thread::sleep_for(chrono::milliseconds(10)); // to check in periods of 0.2?
             // will maybe cause probs if mutliple calculations needed per second
+            if(time>=duration || graph.getSimulationBool()==false){
+                return;
+            }
         }
     }
 
@@ -211,7 +215,18 @@ int main() {
                 }
                 break;
             case 7:
-                obj.startSimulation();
+                cout<<"Simulate for a Specific Time? (Y/N): ";
+                char ch;
+                cin>>ch;
+                if(ch=='y' || ch=='Y'){
+                    int t=0;
+                    cout<<"Enter Time(sec): ";
+                    cin>>t;
+                    obj.startSimulation(t);
+
+                }else{
+                    obj.startSimulation();
+                }
                 break;
             case 8:
                 cout<<"Try again\n";

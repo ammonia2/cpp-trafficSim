@@ -56,6 +56,10 @@ class Vehicle {
         if (travelTime>0) travelTime--;
     }
 
+    void setStart(Intersection* temp){
+        start=temp;
+    }
+
     Intersection* getStart() {
         return start;
     }
@@ -83,9 +87,8 @@ class Vehicle {
     void moveIndex();
 
     void setAtDest(bool arg) {
-        atDest = true;
+        atDest = arg;
     }
-
     bool getAtDest() {
         return atDest;
     }
