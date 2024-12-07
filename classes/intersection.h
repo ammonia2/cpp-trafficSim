@@ -2,7 +2,7 @@
 
 #include <SFML/Graphics.hpp>
 #include <iostream>
-#include "vector.h"
+#include "DynamicArray.h"
 #include "traffic_signal.h"
 using namespace std;
 using namespace sf;
@@ -11,9 +11,9 @@ class Road;
 
 class Intersection {
     char name;
-    Vector<Road*>inRoads;
-    Vector<Road*>outRoads;
-    Vector<TrafficSignal> signals;
+    DynamicArray<Road*>inRoads;
+    DynamicArray<Road*>outRoads;
+    DynamicArray<TrafficSignal> signals;
     int greenTime;
     int x,y;
 
@@ -37,7 +37,9 @@ class Intersection {
     void set_Y(int a){
         y=a;
     }
-
+    DynamicArray<Road*>getInroads(){
+        return inRoads;
+    }
     string getSignal(Road* road);
     
     int get_X(){
@@ -47,7 +49,6 @@ class Intersection {
     int get_Y(){
         return y;
     }
-
     char getName() const {
         return name;
     }
@@ -72,19 +73,6 @@ class Intersection {
         return false;
     }
 
-    void displayIntersection(RenderWindow& window,int x, int y){
-        CircleShape circle(15);
-        circle.setFillColor(Color::Green);
-        circle.setPosition(x-7, y+3);
-        Font font;
-        font.loadFromFile("files/Typographica-Blp5.ttf");
-        Text text(name, font,25);
-        text.setFillColor(Color::Black);
-        text.setPosition(x,y);
-        window.draw(circle);
-        window.draw(text);
-        
-    }
 };
 
  

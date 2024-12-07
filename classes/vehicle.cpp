@@ -1,17 +1,13 @@
 #include "vehicle.h"
-#include "vector.h"
+#include "DynamicArray.h"
 
 void Vehicle::moveIndex() {
-    if (name == "EV18")
-        cout<<"\n\nname\n"<<endl;
-
     currRoadIndex+=1;
     setRoad();
 }
 
 void Vehicle::setRoad() {
     if( route.size()!=0 && (currRoadIndex < route.size() && !atDest) ) {
-        cout<<"entered "<<route.size()<<" Curr:"<<currRoadIndex<<endl;
         travelTime = route[currRoadIndex]->getWeight();
         route[currRoadIndex]->insertVehicle(this);
     }

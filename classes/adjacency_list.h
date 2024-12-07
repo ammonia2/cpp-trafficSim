@@ -1,7 +1,7 @@
 #pragma once
 
 #include <iostream>
-#include "vector.h"
+#include "DynamicArray.h"
 #include <fstream>
 #include <string>
 #include <sstream>
@@ -60,11 +60,11 @@ public:
 };
 
 class AdjacencyList {
-    Vector<IntersectionRoad> roads; // temporary
-    Vector<LinkedList<Road*>> graph;
-    Vector<Intersection*> intersections;
-    Vector<Vehicle*> vehicles;
-    Vector<EmergencyVehicle*> emergencyVehicles;
+    DynamicArray<IntersectionRoad> roads; // temporary
+    DynamicArray<LinkedList<Road*>> graph;
+    DynamicArray<Intersection*> intersections;
+    DynamicArray<Vehicle*> vehicles;
+    DynamicArray<EmergencyVehicle*> emergencyVehicles;
     HashTable<string, LinkedList<Vehicle*>*> roadVehicleMap;
 
     void loadEmergencyVehicles(fstream& file) {
@@ -174,11 +174,16 @@ class AdjacencyList {
 
     void initialiseEmergencyVehicles() {
         for (EmergencyVehicle* vehicle : emergencyVehicles) {
-            vehicles.push_back(vehicle);
+            if (!vehicles.contains(vehicle))
+                vehicles.push_back(vehicle);
             
             // Calculate initial path using A* algorithm
-            Vector<char> refs = aStarAlgo(vehicle->getStart(), vehicle->getEnd());
-            Vector<char> path = constructPath(refs, vehicle->getStart(), vehicle->getEnd());
+            DynamicArray<char> refs = aStarAlgo(vehicle->getStart(), vehicle->getEnd());
+            DynamicArray<char> path = constructPath(refs, vehicle->getStart(), vehicle->getEnd());
+
+            cout<<"EV:" <<vehicle->getName()<<endl;
+
+            vehicle->clearRoute();
             
             if (!path.empty() && path.size() > 1) {
                 // Only process the first road in the path
@@ -223,11 +228,15 @@ class AdjacencyList {
     void initialiseVehicles() {
 
         for (Vehicle* vehicle: vehicles) {
-            Vector<char> refs = dijkstraAlgo(vehicle->getStart(), vehicle->getEnd());
-            Vector<char> path = constructPath(refs, vehicle->getStart(), vehicle->getEnd());
+            cout<<vehicle->getName()<<endl;
+            DynamicArray<char> refs = dijkstraAlgo(vehicle->getStart(), vehicle->getEnd());
+            DynamicArray<char> path = constructPath(refs, vehicle->getStart(), vehicle->getEnd());
+
+            cout<<" PAth: ";
+            path.display();
             
+            vehicle->clearRoute();
             if(!path.empty()) {
-                path.display();
                 for (int i=0; i<path.size()-1; i++) {
                     char c = path[i];
                     char cNext= path[i+1];
@@ -254,13 +263,23 @@ class AdjacencyList {
                 key+=path[0];
                 key+=path[1];
                 if (roadVehicleMap.find(key)) {
+
+                    cout<<key<<endl;
+                    cout<<vehicle->getName()<<endl;
                     roadVehicleMap.search(key)->insertAtStart(vehicle);
+                    roadVehicleMap.search(key)->display();
                 } 
                 else {
+                    cout<<"heloooooo2222\n";
+                    cout<<vehicle->getName()<<endl;
+                    cout<<key<<endl;
                     LinkedList<Vehicle*>* newList = new LinkedList<Vehicle*>();
                     newList->insertAtStart(vehicle);
+                    // newList->display();
                     roadVehicleMap.insert(key, newList);
+                    roadVehicleMap.search(key)->display();
                 }
+                
             }
 
         }
@@ -296,7 +315,7 @@ class AdjacencyList {
             int weightInt = stringToInt(weight);
             maxNode = max(maxNode, max(startNode, endNode));
         
-            // Ensure intersections Vector is large enough
+            // Ensure intersections DynamicArray is large enough
             while (intersections.size() <= (maxNode - 'A')) {
                 char val = 'A' + intersections.size();
                 Intersection* newNode = new Intersection(val);
@@ -357,13 +376,12 @@ class AdjacencyList {
         initialiseGraph();
     }
     
-    Vector<char> dijkstraAlgo(Intersection* start, Intersection* end) { // returns a list of closest previous nodes for each nodes that can be tracked to a single starting point through constructPath
+    DynamicArray<char> dijkstraAlgo(Intersection* start, Intersection* end) { // returns a list of closest previous nodes for each nodes that can be tracked to a single starting point through constructPath
         // setting initial distances to MAX, visited, and priority q
-        Vector<int> distance;
-        Vector<char> previousReferences;
-        Vector<bool> visited;
+        DynamicArray<int> distance;
+        DynamicArray<char> previousReferences;
+        DynamicArray<bool> visited;
         PriorityQueue<DistanceNode> pq(true, intersections.size());
-    
         distance.resize(intersections.size());
         previousReferences.resize(intersections.size());
         visited.resize(intersections.size());
@@ -373,10 +391,8 @@ class AdjacencyList {
             distance[intsc->getName() - 'A'] = INT_MAX;
             previousReferences[intsc->getName() - 'A'] = '\0';
         }
-    
         distance[start->getName() - 'A'] = 0;
         pq.push(DistanceNode(start, 0));
-    
         // main algo
         while (!pq.isEmpty()) {
             DistanceNode minNode = pq.top();
@@ -392,13 +408,12 @@ class AdjacencyList {
     
             LinkedList<Road*>& edges = graph[minNodeName - 'A'];
             LinkedList<Road*>::Node* edge = edges.getHead();
-
             while (edge) {
+
                 if(edge->data->getStatus() == "Clear") {
                     Intersection* neighbour = edge->data->getDest();
                     int weight = edge->data->getWeight();
                     int tempDistance = distance[minNodeName - 'A'] + weight;
-        
                     if (tempDistance < distance[neighbour->getName() - 'A']) {
                         distance[neighbour->getName() - 'A'] = tempDistance;
                         previousReferences[neighbour->getName() - 'A'] = minNodeName;
@@ -409,12 +424,11 @@ class AdjacencyList {
             }
 
         }
-    
         return previousReferences;
     }
     
-    Vector<char> constructPath(Vector<char>& previousRefs, Intersection* start, Intersection* end) {
-        Vector<char> path;
+    DynamicArray<char> constructPath(DynamicArray<char>& previousRefs, Intersection* start, Intersection* end) {
+        DynamicArray<char> path;
         for (char at = end->getName(); at != '\0'; at = previousRefs[at - 'A']) {
             path.push_back(at);
         }
@@ -429,13 +443,13 @@ class AdjacencyList {
     // exact way to measure heuristic is to calculate the travelTime from the edge to the ending edge. 
     // (could also require checking congestion (secondary weight))
 
-    Vector<char> aStarAlgo(Intersection* start, Intersection* end) {
+    DynamicArray<char> aStarAlgo(Intersection* start, Intersection* end) {
 
-        // Initialize vectors and priority queue
-        Vector<int> distance; // g(n): cost to reach the node
-        Vector<int> heuristic; // h(n): estimated cost to goal
-        Vector<char> previousReferences; // Tracks the path
-        Vector<bool> visited;
+        // Initialize DynamicArrays and priority queue
+        DynamicArray<int> distance; // g(n): cost to reach the node
+        DynamicArray<int> heuristic; // h(n): estimated cost to goal
+        DynamicArray<char> previousReferences; // Tracks the path
+        DynamicArray<bool> visited;
         PriorityQueue<DistanceNode> pq(true, intersections.size()); // Min-heap
 
         distance.resize(intersections.size());
@@ -526,14 +540,14 @@ class AdjacencyList {
     // behind the other and no collision happens to occur
     void updateSimulation() {
 
-        Vector<Vehicle*> atRoadEnd;
-        Vector<Road*> doneRoads;
+        DynamicArray<Vehicle*> atRoadEnd;
+        DynamicArray<Road*> doneRoads;
         
 
         for(Vehicle* veh: vehicles) {
             
             if( !veh->getRoute().empty() && !veh->getAtDest() ) {
-                Vector<Road*> route = veh->getRoute();
+                DynamicArray<Road*> route = veh->getRoute();
 
                 if (route.size()==veh->getIndex() && veh->getTime() <= 1 ) {
                     Intersection* currentIntersection =  route[veh->getIndex() - 1]->getDest();
@@ -553,8 +567,8 @@ class AdjacencyList {
                         oldKey+=veh->getOld();
                         oldKey+=currentIntersection->getName();
 
-                        Vector<char> refs = aStarAlgo(currentIntersection, veh->getEnd());
-                        Vector<char> newPath = constructPath(refs, currentIntersection, veh->getEnd());
+                        DynamicArray<char> refs = aStarAlgo(currentIntersection, veh->getEnd());
+                        DynamicArray<char> newPath = constructPath(refs, currentIntersection, veh->getEnd());
                         
                         if(!newPath.empty() && newPath.size() > 1) {
 
@@ -698,8 +712,8 @@ class AdjacencyList {
     }
     
     //Displaying Vehicles on each road
-    void display_Vehicles_at_Roads(){
-        cout<<"Congestion Status"<<endl;
+    void display_Vehicles_at_Roads() {
+        cout << "Starting display of vehicles..." << endl;
         for(Intersection* intsc : intersections){
             char name=intsc->getName();
             LinkedList<Road*>::Node* node=graph[name-'A'].getHead();
@@ -707,12 +721,21 @@ class AdjacencyList {
                 string key="";
                 key+=name;
                 key+=node->data->getDest()->getName();
+                cout << "Checking road " << key << endl;
                 if(roadVehicleMap.find(key)) {
+                    cout << "Found entry for road " << key << endl;
                     LinkedList<Vehicle*>* temp_veh = roadVehicleMap.search(key);
                     LinkedList<Vehicle*>::Node* veh_head = temp_veh->getHead();
                     
+                    cout << "Before removing reached vehicles:" << endl;
+                    LinkedList<Vehicle*>::Node* debug_head = veh_head;
+                    while (debug_head) {
+                        cout << debug_head->data->getName() << " atDest=" 
+                            << debug_head->data->getAtDest() << endl;
+                        debug_head = debug_head->next;
+                    }
                     // getting which vehicles have reached dest.
-                    Vector<Vehicle*> tempVs;
+                    DynamicArray<Vehicle*> tempVs;
                     while (veh_head) {
                         if (veh_head->data->getAtDest())
                             tempVs.push_back(veh_head->data);
@@ -723,15 +746,24 @@ class AdjacencyList {
                     for (Vehicle* veh: tempVs) {
                         temp_veh->removeByValue(veh);
                     }
-
+                    string color="";
+                    if(node->data->getDest()->getSignal(node->data)=="GREEN"){
+                        color="\033[1;32m";
+                    }
+                    else if(node->data->getDest()->getSignal(node->data)=="RED"){
+                        color="\033[1;31m";
+                    }
+                    else if(node->data->getDest()->getSignal(node->data)=="YELLOW"){
+                        color="\033[1;33m";
+                    }
                     veh_head= temp_veh->getHead();
-                    cout<<"Signal: "<<node->data->getDest()->getSignal(node->data)<<" Time: "<<node->data->getDest()->getSignalTime(node->data)<<" Vehicles in Path "<<key[0]<<" to "<<key[1]<<" are "<<temp_veh->getSize()<<" : ";
+                    cout<<color<<"Signal: "<<node->data->getDest()->getSignal(node->data)<<" Time: "<<node->data->getDest()->getSignalTime(node->data)<<" Vehicles in Path "<<key[0]<<" to "<<key[1]<<" are "<<temp_veh->getSize()<<" : ";
                     
                     while (veh_head) {
                         cout<<veh_head->data->getName()<<" ( " << veh_head->data->getPriorityLevel() << ", "<< veh_head->data->getTime() << " ) ";
                         veh_head = veh_head->next;
                     }
-                    cout<<endl;
+                    cout << "\033[0m" << endl;
 
                 }
                 node=node->next;
@@ -740,55 +772,213 @@ class AdjacencyList {
         }
     }
 
-    void displayGraph(RenderWindow& window, int x,int y) {
-        int i=0;
-        cout<<"City Graph System"<<endl;
+    void displaySignals() {
+        cout<<"\033[1;34m---------------Traffic Signal Status-------------------\033[0m\n";
+        for (Intersection* intsc : intersections){
+            
+            cout<<"\n\033[1;34mIntersection: "<<intsc->getName()<<" \033[0m\n";
+            if(intsc->getInroads().empty()){
+                cout<<"\033[1;33mNo Signal\033[0m\n";
+            }
+            int count=1;
+            for(Road* inrd: intsc->getInroads()) {
+                if (inrd->getDest()->getSignal(inrd) == "GREEN") {
+                    cout << "\033[1;32mSignal "<<count<<": GREEN TIME: ";
+                    cout<<inrd->getDest()->getSignalTime(inrd)<<"\033[0m";
+                } 
+                else if (inrd->getDest()->getSignal(inrd) == "RED") {
+                    cout << "\033[1;31mSignal "<<count<< ": RED TIME: ";
+                    cout<<inrd->getDest()->getSignalTime(inrd)<<"\033[0m";
+                } 
+                else if (inrd->getDest()->getSignal(inrd) == "YELLOW") {
+                    cout << "\033[1;34mSignal "<< count << ": YELLOW TIME: ";
+                    cout<<inrd->getDest()->getSignalTime(inrd)<<"\033[0m";
+                }
+                count++;
+                cout<<endl;
+            }
+        }
+    }
+
+    void displayGraph() {
+        cout << "\033[1;36m-------------City Graph System-----------\033[0m" << endl;
         for (Intersection* intsc : intersections) {
             char name = intsc->getName();
-            cout<<name<<": ";
-            graph[name-'A'].printList();
+            cout << "\033[1;36m" << name << ": \033[0m";
+            LinkedList<Road*>::Node* temp = graph[name - 'A'].getHead();
+            if (temp == nullptr) {
+                cout << "\033[1;36mNo Road\033[0m";
+            } 
+            else {
+                while (temp != nullptr) {
+                    cout << "\033[1;36m{" << temp->data->getDest()->getName() 
+                        << ", " << temp->data->getWeight() << "} \033[0m";
+                    temp = temp->next;
+                }
+            }
+            cout << endl;
         }
-        cout<<endl;
-        //     // if(!graph[name- 'A'].isEmpty()){
-            //     int index = 0;
-            //     float angleStep=360/(graph[name- 'A'].getSize()+1);
-            //     // float angleStep=90;
-            //     float currentAngle=0.0;
-            //     //Setting coordinates of Intersection
-            //     if(intsc->get_X()==0 && intsc->get_Y()==0){
-            //         // cout<<intsc->getName()<<endl;
-            //         intsc->set_X(x);
-            //         intsc->set_Y(y);
-            //     }
-            //     while (index<graph[name- 'A'].getSize()) {
-            //         if((graph[name- 'A'].getNode(index))){
-            //             Road* node_road = &(graph[name- 'A'].getNode(index)->data);
-            //             // cout<<name<<" "<<intsc->get_X()<<" "<<intsc->get_Y()<<endl;;
-            //             node_road->displayRoads(window, intsc->get_X()+20, intsc->get_Y(),currentAngle);
-            //         }
-            //         currentAngle+=angleStep;
-            //         index++;
-            //     }
-            // }
-            // intsc->displayIntersection(window,intsc->get_X(),intsc->get_Y());
-            // break;
-            // i+=1;
-            // if(i==2)
-            //     break;
-            // x+=50;
-            // y+=50;
-            
-        // }
-        display_Roads_Status();
-        display_Vehicles_at_Roads();
+        cout << endl;
     }
+
+    Intersection* getIntersection(char A) {
+        return intersections[A - 'A'];
+    }
+
+    void appendVehicle(Vehicle* vehicle) {
+        DynamicArray<char> refs = dijkstraAlgo(vehicle->getStart(), vehicle->getEnd());
+        DynamicArray<char> path = constructPath(refs, vehicle->getStart(), vehicle->getEnd());
+        if(!path.empty()) {
+            for (int i=0; i<path.size()-1; i++) {
+                char c = path[i];
+                char cNext= path[i+1];
+                Road* road = nullptr;
+                LinkedList<Road*>& edges = graph[c-'A'];
+                LinkedList<Road*>::Node* edge = edges.getHead();
+
+                while (edge) {
+                    if (edge->data->getDest() -> getName() == cNext) {
+                        road= edge->data;
+                        break;
+                    }
+                    edge = edge->next;
+                }
+
+                if (road){
+                    vehicle->addRoad(road);
+                }
+            }
+
+            vehicle->setRoad();
+            
+            // inserting in hashmap
+            string key="";
+            key+=path[0];
+            key+=path[1];
+            if (roadVehicleMap.find(key)) {
+                roadVehicleMap.search(key)->insertAtStart(vehicle);
+            }
+            else {
+                LinkedList<Vehicle*>* newList = new LinkedList<Vehicle*>();
+                newList->insertAtStart(vehicle);
+                roadVehicleMap.insert(key, newList);
+            }
+        }
+
+    }
+
+    void appendEV(Vehicle* vehicle) {
+        vehicles.push_back(vehicle);
+
+        DynamicArray<char> refs = aStarAlgo(vehicle->getStart(), vehicle->getEnd());
+        DynamicArray<char> path = constructPath(refs, vehicle->getStart(), vehicle->getEnd());
+        
+        if (!path.empty() && path.size() > 1) {
+            // Only process the first road in the path
+            char currentNode = path[0];
+            char nextNode = path[1];
+            
+            // Find the corresponding road
+            Road* road = nullptr;
+            LinkedList<Road*>& edges = graph[currentNode - 'A'];
+            LinkedList<Road*>::Node* edge = edges.getHead();
+            
+            while (edge) {
+                if (edge->data->getDest()->getName() == nextNode) {
+                    road = edge->data;
+                    break;
+                }
+                edge = edge->next;
+            }
+            
+            if (road) {
+                vehicle->addRoad(road);
+                vehicle->setRoad();
+                vehicle->setOld(vehicle->getStart()->getName());
+                
+                // Add to roadVehicleMap
+                string key = "";
+                key += currentNode;
+                key += nextNode;
+                
+                if (roadVehicleMap.find(key)) {
+                    roadVehicleMap.search(key)->insertAtStart(vehicle);
+                } else {
+                    LinkedList<Vehicle*>* newList = new LinkedList<Vehicle*>();
+                    newList->insertAtStart(vehicle);
+                    roadVehicleMap.insert(key, newList);
+                }
+            }
+        }
+    }
+
+    Road* findRoad(char start, char end) {
+        LinkedList<Road*>::Node* edge = graph[start-'A'].getHead();
+        while (edge) {
+            if (edge->data->getDest()->getName() == end) {
+                return edge->data;
+            }
+            edge = edge->next;
+        }
+
+        return nullptr;
+    }
+
+    void initialiseRoutes(char start, Road* road) {
+
+        for (Vehicle* vehicle : vehicles) {
+            vehicle->clearRoute();
+            vehicle->setIndex(0);
+            vehicle->setTime(0);
+            vehicle->setAtDest(false);
+        }
+
+        roadVehicleMap.clear();
+
+        initialiseVehicles();
+        cout << "After initializing regular vehicles:" << endl;
+        // Debug prints for hashmap contents
+        for(Intersection* intsc : intersections) {
+            char name = intsc->getName();
+            LinkedList<Road*>::Node* node = graph[name-'A'].getHead();
+            while(node) {
+                string key = "";
+                key += name;
+                key += node->data->getDest()->getName();
+                if(roadVehicleMap.find(key)) {
+                    cout << "Road " << key << " has vehicles: ";
+                    LinkedList<Vehicle*>* temp_veh = roadVehicleMap.search(key);
+                    LinkedList<Vehicle*>::Node* veh_head = temp_veh->getHead();
+                    while(veh_head) {
+                        cout << veh_head->data->getName() << " ";
+                        veh_head = veh_head->next;
+                    }
+                    cout << endl;
+                }
+            }
+        }
+        
+        initialiseEmergencyVehicles();
+
+    }
+
+    void clearQueues() {
+        for (Intersection* intsc: intersections) {
+            LinkedList<Road*>& edges = graph[intsc->getName() - 'A'];
+            LinkedList<Road*>::Node* head = edges.getHead();
+
+            while (head) {
+                head->data->clearQueue();
+                head = head->next;
+            }
+            
+        }
+    }
+
 };
 
 
 // display all possible paths between intersections with weights.
-// signals
-// emergency vehicle integration
 
 // TO DO:
 // add all paths in hashMap whether they're blocked or not.
-// show blocked paths, clear paths

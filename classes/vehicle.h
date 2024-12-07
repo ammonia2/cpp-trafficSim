@@ -17,7 +17,7 @@ struct Coord {
 class Vehicle {
     protected:
     string name;
-    Vector<Road*> route;
+    DynamicArray<Road*> route;
     int currRoadIndex; // will change as road changes
     Coord position;
     Intersection* start, *end;
@@ -64,7 +64,7 @@ class Vehicle {
         return end;
     }
 
-    Vector<Road*> getRoute() {
+    DynamicArray<Road*> getRoute() {
         return route;
     }
 
@@ -96,7 +96,9 @@ class Vehicle {
 
     virtual void setOld(char o) {}
 
-    virtual char getOld() {}
+    virtual char getOld() {
+        return '\0';
+    }
 
     bool operator<(const Vehicle& other) const {
         if (this->travelTime == other.travelTime) {

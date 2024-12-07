@@ -5,7 +5,7 @@ using namespace std;
 
 template <typename T>
 
-class Vector {
+class DynamicArray {
 
 private:
 
@@ -31,9 +31,9 @@ private:
 
 public:
 
-    Vector() : data(nullptr), sz(0), cap(0) {}
+    DynamicArray() : data(nullptr), sz(0), cap(0) {}
 
-    Vector(const Vector& other) : sz(other.sz), cap(other.cap) {
+    DynamicArray(const DynamicArray& other) : sz(other.sz), cap(other.cap) {
         data = new T[cap];
         for (int i = 0; i < sz; ++i) {
             data[i] = other.data[i];
@@ -41,7 +41,7 @@ public:
     }
 
     // Copy assignment operator
-    Vector& operator=(const Vector& other) {
+    DynamicArray& operator=(const DynamicArray& other) {
         if (this != &other) {
             delete[] data;
             sz = other.sz;
@@ -54,7 +54,7 @@ public:
         return *this;
     }
 
-    ~Vector() {
+    ~DynamicArray() {
 
         delete[] data;
 
@@ -67,19 +67,19 @@ public:
         return false;
     }
 
-    int size() const { // return size of vector
+    int size() const { // return size of Dynamic Array
 
         return sz;
 
     }
 
-    int capacity() const { // return max capacity of vector
+    int capacity() const { // return max capacity of Dynamic Array
 
         return cap;
 
     }
 
-    bool empty() const { // return if vector is empty or not
+    bool empty() const { // return if Dynamic Array is empty or not
 
         return sz == 0;
 
@@ -88,7 +88,7 @@ public:
     // Note: 
     // dummy used to handle error cases where index is out of range by returning a referencable object.
     // const functions are the same as the functions defined above them with the difference that the 
-    // vector object is not modified in them, useful for const vector objects.
+    // vector object is not modified in them, useful for const DynamicArray objects.
 
     T& at(int index) { // return data at specified index
 
@@ -130,11 +130,11 @@ public:
 
     }
 
-    T& front() { // return the first element in the vector
+    T& front() { // return the first element in the Dynamic Array
 
         if (empty()) {
 
-            cout << "Vector is empty\n";
+            cout << "Dynamic Array is empty\n";
             static T dummy;
             return dummy;
 
@@ -148,7 +148,7 @@ public:
 
         if (empty()) {
 
-            cout << "Vector is empty\n";
+            cout << "Dynamic Array is empty\n";
             static T dummy;
             return dummy;
 
@@ -158,11 +158,11 @@ public:
 
     }
 
-    T& back() { // return the last element in the vector
+    T& back() { // return the last element in the Dynamic Array
 
         if (empty()) {
 
-            cout << "Vector is empty\n";
+            cout << "Dynamic Array is empty\n";
             static T dummy;
             return dummy;
 
@@ -176,7 +176,7 @@ public:
 
         if (empty()) {
 
-            cout << "Vector is empty\n";
+            cout << "Dynamic Array is empty\n";
             static T dummy;
             return dummy;
 
@@ -186,7 +186,7 @@ public:
 
     }
 
-    void push_back(const T& value) { // insert element at end of vector
+    void push_back(const T& value) { // insert element at end of Dynamic Array
 
         if (sz == cap) {
 
@@ -218,11 +218,11 @@ public:
 
     }
 
-    void pop_back() { // remove element from end of vector
+    void pop_back() { // remove element from end of Dynamic Array
 
         if (empty()) {
 
-            cout << "Vector is empty\n";
+            cout << "Dynamic Array is empty\n";
             return;
 
         }
@@ -238,7 +238,7 @@ public:
         cap = 0;
     }
 
-    void reserve(int newCap) { // allocate an amount of memory to the vector
+    void reserve(int newCap) { // allocate an amount of memory to the Dynamic Array
 
         if (newCap > cap) {
 
@@ -248,7 +248,7 @@ public:
 
     }
 
-    void shrink_to_fit() { // shrink the vector to its current size
+    void shrink_to_fit() { // shrink the Dynamic Array to its current size
 
         if (sz < cap) {
 

@@ -115,22 +115,25 @@ public:
 
     }
 
-    ~HashTable() {
-
+    void clear() {
         for (int i = 0; i < capacity; i++) {
-
             HashNode<K, V>* current = table[i];
-
             while (current) {
-
                 HashNode<K, V>* temp = current;
                 current = current->next;
                 delete temp;
-
             }
-
+            table[i] = nullptr;
         }
+        
+        // Reset to original state
+        capacity = nextPrime(20);
+        size = 0;
+        loadFactor = 0.75;
+    }
 
+    ~HashTable() {
+        clear();
         delete[] table;
 
     }
