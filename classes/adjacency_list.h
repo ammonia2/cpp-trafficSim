@@ -916,6 +916,9 @@ class AdjacencyList {
     }
 
     void initialiseRoutes(char start, Road* road) {
+        //Storing Current index, as after removing hashmap is reset so storing current intersection to 
+        // start from where ended, but not working , a vehicle is present on multiple keys 
+        // after all iniitalizing and some times displayed 2 times on same key. 
         for(Vehicle* veh: vehicles){
             cout<<veh->getName()<<" "<<veh->getStart()->getName()<<endl;
             if(veh->getIndex()!=0 && !veh->getAtDest())
