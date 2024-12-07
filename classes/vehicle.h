@@ -1,7 +1,6 @@
 #pragma once
 
 #include "road.h"
-#include <SFML/Graphics.hpp>
 #include <iostream>
 #include "intersection.h"
 using namespace std;

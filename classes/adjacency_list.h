@@ -15,7 +15,6 @@
 #include "hashtable.h"
 
 using namespace std;
-using namespace sf;
 
 #define INT_MAX 10000000
 
@@ -67,6 +66,8 @@ class AdjacencyList {
     DynamicArray<EmergencyVehicle*> emergencyVehicles;
     HashTable<string, LinkedList<Vehicle*>*> roadVehicleMap;
     bool Simulation=true;
+    bool initialised = false;
+
     void loadEmergencyVehicles(fstream& file) {
         string line;
         int counter=0;
@@ -352,8 +353,8 @@ class AdjacencyList {
         loadSignalTimings(signals_file);
         loadVehicles(vehicles_file);
         loadEmergencyVehicles(EmergencyVehicles_file);
-        initialiseVehicles();
-        initialiseEmergencyVehicles();
+        // initialiseVehicles();
+        // initialiseEmergencyVehicles();
 
         // initialise signal timings
         for (Intersection* intsc: intersections) {
@@ -631,7 +632,6 @@ class AdjacencyList {
                         if ( veh->getTime()==0 && road->getDest()->signalActive(road)) {
 
                             veh = road->getHeapTop();
-                            veh = road->getHeapTop();
 
                             route = veh->getRoute();
                             temp_idx=veh->getIndex();
@@ -652,27 +652,95 @@ class AdjacencyList {
                         }
                     }
 
-                    // Updating HashMap
                     // FINDING NEXT ROAD
                     // need to add the functionality that if the next road is blocked, then the 
                     // route needs to be recalculated from that intersection (don't forget to
                     // delete the roads ahead of that!)
+
+                    // Updating HashMap
                     if( veh->getIndex()>temp_idx && route.size()!=veh->getIndex() ) {
-                        
-                        roadVehicleMap.search(key)->removeByValue(veh);
+                        Road* nextRoad = route[veh->getIndex()];
 
-                        key="";
-                        key+=route[veh->getIndex() - 1]->getDest()->getName();
-                        key+=route[veh->getIndex()]->getDest()->getName();
+                        if (nextRoad->getStatus() != "Clear") {
+                            nextRoad->removeVehicle();
+                            Intersection* currentIntersection = route[veh->getIndex() - 1]->getDest();
 
-                        if (roadVehicleMap.find(key)) {
-                            roadVehicleMap.search(key)->insertAtStart(veh);
+                            // new path calculation
+                            DynamicArray<char> refs = aStarAlgo(currentIntersection, veh->getEnd());
+                            DynamicArray<char> newPath = constructPath(refs, currentIntersection, veh->getEnd());
+
+                            roadVehicleMap.search(key)->removeByValue(veh);
+                            if (!newPath.empty() && newPath.size() > 1) {
+                                // Clear routes after current index
+                                DynamicArray<Road*> newRoute;
+                                for (int i = 0; i < veh->getIndex(); i++) {
+                                    newRoute.push_back(route[i]);
+                                }
+                                
+                                // Add new roads from the new path
+                                for (int i = 0; i < newPath.size() - 1; i++) {
+                                    char c = newPath[i];
+                                    char cNext = newPath[i + 1];
+                                    Road* road = nullptr;
+                                    LinkedList<Road*>& edges = graph[c - 'A'];
+                                    LinkedList<Road*>::Node* edge = edges.getHead();
+                                    
+                                    while (edge) {
+                                        if (edge->data->getDest()->getName() == cNext) {
+                                            road = edge->data;
+                                            break;
+                                        }
+                                        edge = edge->next;
+                                    }
+                                    
+                                    if (road) {
+                                        newRoute.push_back(road);
+                                    }
+                                }
+                                
+                                // Update vehicle's route
+                                veh->clearRoute();
+                                for (Road* r : newRoute) {
+                                    veh->addRoad(r);
+                                }
+                                veh->setRoad();
+                                
+                                // Update hashmap with first new road
+                                string newKey = "";
+                                newKey += newPath[0];
+                                newKey += newPath[1];
+                                
+                                if (roadVehicleMap.find(newKey)) {
+                                    roadVehicleMap.search(newKey)->insertAtStart(veh);
+                                } else {
+                                    LinkedList<Vehicle*>* newList = new LinkedList<Vehicle*>();
+                                    newList->insertAtStart(veh);
+                                    roadVehicleMap.insert(newKey, newList);
+                                }
+                            } else {
+                                cout << "\033[1;33m" << veh->getName() 
+                                    << " cannot reach destination - no alternate route available\033[0m" << endl;
+                                veh->setAtDest(true);  // Mark as "reached" to remove from simulation
+                            }
                         }
                         else {
-                            LinkedList<Vehicle*>* newList = new LinkedList<Vehicle*>();
-                            newList->insertAtStart(veh);
-                            roadVehicleMap.insert(key, newList);
+                            // existing hashmap updation logic
+                            roadVehicleMap.search(key)->removeByValue(veh);
+
+                            key="";
+                            key+=route[veh->getIndex() - 1]->getDest()->getName();
+                            key+=route[veh->getIndex()]->getDest()->getName();
+
+                            if (roadVehicleMap.find(key)) {
+                                roadVehicleMap.search(key)->insertAtStart(veh);
+                            }
+                            else {
+                                LinkedList<Vehicle*>* newList = new LinkedList<Vehicle*>();
+                                newList->insertAtStart(veh);
+                                roadVehicleMap.insert(key, newList);
+                            }
                         }
+
                     }
                 }
 
@@ -915,28 +983,33 @@ class AdjacencyList {
         return nullptr;
     }
 
-    void initialiseRoutes(char start, Road* road) {
-        //Storing Current index, as after removing hashmap is reset so storing current intersection to 
-        // start from where ended, but not working , a vehicle is present on multiple keys 
-        // after all iniitalizing and some times displayed 2 times on same key. 
-        for(Vehicle* veh: vehicles){
-            cout<<veh->getName()<<" "<<veh->getStart()->getName()<<endl;
-            if(veh->getIndex()!=0 && !veh->getAtDest())
-                veh->setStart(veh->getRoute()[veh->getIndex()-1]->getDest());
-            cout<<veh->getName()<<" "<<veh->getStart()->getName()<<endl;
-        }
-        for (Vehicle* vehicle : vehicles) {
-            vehicle->clearRoute();
-            // vehicle->setTime(20);
-            vehicle->setAtDest(false);
-        }
-
-        roadVehicleMap.clear();
-        display_Vehicles_at_Roads();
+    void initialiseRoutes() {
         initialiseVehicles();
         initialiseEmergencyVehicles();
-        
     }
+
+    // void initialiseRoutes(char start, Road* road) {
+    //     //Storing Current index, as after removing hashmap is reset so storing current intersection to 
+    //     // start from where ended, but not working , a vehicle is present on multiple keys 
+    //     // after all iniitalizing and some times displayed 2 times on same key. 
+    //     for(Vehicle* veh: vehicles){
+    //         cout<<veh->getName()<<" "<<veh->getStart()->getName()<<endl;
+    //         if(veh->getIndex()!=0 && !veh->getAtDest())
+    //             veh->setStart(veh->getRoute()[veh->getIndex()-1]->getDest());
+    //         cout<<veh->getName()<<" "<<veh->getStart()->getName()<<endl;
+    //     }
+    //     for (Vehicle* vehicle : vehicles) {
+    //         vehicle->clearRoute();
+    //         // vehicle->setTime(20);
+    //         vehicle->setAtDest(false);
+    //     }
+
+    //     roadVehicleMap.clear();
+    //     display_Vehicles_at_Roads();
+    //     initialiseVehicles();
+    //     initialiseEmergencyVehicles();
+        
+    // }
 
     void clearQueues() {
         for (Intersection* intsc: intersections) {
@@ -949,6 +1022,56 @@ class AdjacencyList {
             }
             
         }
+    }
+
+    bool getInitialised() {
+        return initialised;
+    }
+
+    void setInitialised(bool param) {
+        initialised = param;
+    }
+
+    bool hasVehiclesOnRoads() {
+        for(Intersection* intsc : intersections){
+            char name = intsc->getName();
+            LinkedList<Road*>::Node* node = graph[name-'A'].getHead();
+            while(node) {
+                string key = "";
+                key += name;
+                key += node->data->getDest()->getName();
+                if(roadVehicleMap.find(key)) {
+                    LinkedList<Vehicle*>* temp_veh = roadVehicleMap.search(key);
+                    if(temp_veh->getSize() > 0) {
+                        return true;
+                    }
+                }
+                node = node->next;
+            }
+        }
+        return false;
+    }
+
+    void displayBlockedRoads() {
+        cout << "\033[1;31m---------------Blocked Roads-------------------\033[0m\n";
+        bool hasBlocked = false;
+        
+        for (Intersection* intsc : intersections) {
+            LinkedList<Road*>& list = graph[intsc->getName()-'A'];
+            for (LinkedList<Road*>::Node* node = list.getHead(); node != nullptr; node = node->next) {
+                Road* rd = node->data;
+                if (rd->getStatus() != "Clear") {
+                    hasBlocked = true;
+                    cout << "\033[1;31m" << intsc->getName() << " to " 
+                        << rd->getDest()->getName() << " is blocked\033[0m" << endl;
+                }
+            }
+        }
+        
+        if (!hasBlocked) {
+            cout << "\033[1;32mNo blocked roads in the network\033[0m" << endl;
+        }
+        cout << endl;
     }
 
 };

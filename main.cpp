@@ -1,6 +1,7 @@
-// g++ main.cpp classes/intersection.cpp classes/vehicle.cpp -o app -lsfml-graphics -lsfml-window -lsfml-system && ./app
+// command to run:
+// g++ -o app main.cpp classes/intersection.cpp classes/vehicle.cpp && ./app
 
-#include <SFML/Graphics.hpp>
+
 #include <iostream>
 #include <chrono>
 #include <thread>
@@ -15,81 +16,44 @@
 #include "classes/DynamicArray.h"
 
 using namespace std;
-using namespace sf;
-
-// CLASSES STRUCTURE:
-//  class Traffic Signal: (not all nodes have traffic signals)
-//      green time, yellow 3, red: total (can be assumed 60) - green - yellow
-
-//  class Intersection (Node):
-//      DynamicArray incoming roads
-//      DynamicArray outgoing roads
-//      traffic Signal
-
-//  class Road:
-//      length, congestion level
-//      DynamicArray vehicles
-
-//  class Vehicle:
-//      road, position on road
-//      progress of route
-//      start, End Intersection
-
-//  class Emergency Vehicle (inherits from Vehicle):
-//      different priority, dynamic routing (next road will be calculated at every intersection)
-
-//  class TrafficManagement:
-//      list of intersections,
-//      list of roads, vehicles,
-//      roads and vehicles stored in an adjacency list
-//      clock for updating vehicles
-
-// #include <iostream>
-
-// int main() {
-//     // ANSI escape codes for text colors
-//     std::cout << "\033[1;31mThis is red text.\033[0m\n";  // Red
-//     std::cout << "\033[1;32mThis is green text.\033[0m\n"; // Green
-//     std::cout << "\033[1;33mThis is yellow text.\033[0m\n"; // Yellow
-//     std::cout << "\033[1;34mThis is blue text.\033[0m\n"; // Blue
-//     std::cout << "\033[1;35mThis is magenta text.\033[0m\n"; // Magenta
-//     std::cout << "\033[1;36mThis is cyan text.\033[0m\n"; // Cyan
-//     std::cout << "\033[1;37mThis is white text.\033[0m\n"; // White
-
-//     return 0;
-// }
+using namespace std::chrono;
 
 class Road;
 class Vehicle;
 class AdjacencyList;
 class TrafficSignal;
 
-class TrafficManagement{
-
+class TrafficManagement {
     DynamicArray<Intersection*> intersection;
     DynamicArray<Road*> roads;
     DynamicArray<Vehicle*> vehicles;
     AdjacencyList graph;
-    Clock clock;
 
-    public:
-
-    void startSimulation(int duration=-1) {
-        int time=0;
-        static auto lastUpdate = chrono::steady_clock::now();
+public:
+    void startSimulation(int duration = -1) {
+        int time = 0;
+        auto lastUpdate = steady_clock::now();
         graph.setSimultaionBool(true);
+        if (!graph.getInitialised()) {
+            graph.initialiseRoutes();
+            graph.setInitialised(true);
+        }
         while (true) {
-            auto now = chrono::steady_clock::now();
-            if (chrono::duration_cast<chrono::seconds>(now - lastUpdate).count() >= 1) { // 1sec
+            auto now = steady_clock::now();
+            if (duration_cast<seconds>(now - lastUpdate).count() >= 1) { // 1 sec
                 graph.updateSimulation();
                 lastUpdate = now;
-                time+=1;
+                time += 1;
             }
-        
-            this_thread::sleep_for(chrono::milliseconds(10)); // to check in periods of 0.2?
-            // will maybe cause probs if mutliple calculations needed per second
-            if(time>=duration || graph.getSimulationBool()==false){
+
+            this_thread::sleep_for(milliseconds(10));
+            
+            // will maybe cause probs if multiple calculations needed per second
+            if (duration != -1 && time >= duration || graph.getSimulationBool() == false) {
                 return;
+            }
+            else {
+                if (!graph.hasVehiclesOnRoads()) return;
             }
         }
     }
@@ -101,7 +65,7 @@ class TrafficManagement{
     void displayCongestionStatus() {
         graph.display_Vehicles_at_Roads();
     }
-    
+
     void displaySignalStatus() {
         graph.displaySignals();
     }
@@ -111,63 +75,57 @@ class TrafficManagement{
     }
 
     void displayBlockedRoads() {
-
-        // for (int i = 0; i < roads.size(); i++) {
-
-        //     if (roads[i]->getStatus() == "Blocked") {
-
-        //         // cout << "Blocked Road: " << roads[i]->getStartInt()->getName()
-        //         // << " -> " << roads[i]->get()->getName() << endl;
-        //     }
-        // }
+        graph.displayBlockedRoads();
     }
 
     void blockRoad() {
         char start, end;
-        cout<<"Enter Start Intersection of the road to Block: ";
-        cin>>start;
-        cout<<"Enter End Intersection of the road to Block: ";
-        cin>>end;
+        cout << "Enter Start Intersection of the road to Block: ";
+        cin >> start;
+        cout << "Enter End Intersection of the road to Block: ";
+        cin >> end;
 
         Road* road = graph.findRoad(start, end);
-        if (road) {
+        // if (road && road->getTrafficLoad() >0) {
+        //     cout<<"Vehicles present in the road. Can't block it yetn\n";
+        // }
+         if (road) {
             road->setStatus("Blocked");
-            graph.clearQueues();
-            graph.initialiseRoutes(start, road);
+            // graph.clearQueues();
+            // graph.initialiseRoutes(start, road);
             return;
         }
-        cout<<"Road Not Found!\n";
+        cout << "Road Not Found!\n";
     }
 
-    void addVehicle(Vehicle* veh, bool ev=0) {
+    void addVehicle(Vehicle* veh, bool ev = 0) {
         if (!ev)
             graph.appendVehicle(veh);
         else
             graph.appendEV(veh);
     }
-
 };
 
 int main() {
     TrafficManagement obj;
-    
-    cout<<"-----------------Simulation Dashboard------------------------\n";
-    cout<<"1. Display City Traffic Network\n";
-    cout<<"2. Display Traffic Signal Status\n";
-    cout<<"3. Display Congestions Status\n";
-    cout<<"4. Display Bloacked Roads\n";
-    cout<<"5. Block a Road\n";
-    cout<<"6. Add a Vehicle/Emergency Vehicle\n";
-    cout<<"7. Simulate Vehicle Routing\n";
-    cout<<"8. Exit Simulation\n";
+
+    cout << "-----------------Simulation Dashboard------------------------\n";
+    cout << "1. Display City Traffic Network\n";
+    cout << "2. Display Traffic Signal Status\n";
+    cout << "3. Display Congestions Status\n";
+    cout << "4. Display Blocked Roads\n";
+    cout << "5. Block a Road\n";
+    cout << "6. Add a Vehicle/Emergency Vehicle\n";
+    cout << "7. Simulate Vehicle Routing\n";
+    cout << "8. Exit Simulation\n";
 
     int choice;
-    cin>>choice;
+    cin >> choice;
     string name;
 
     Intersection* s, *e;
 
-    while (choice <=8 && choice >=1) {
+    while (choice <= 8 && choice >= 1) {
         switch (choice) {
             case 1:
                 obj.displayCityTrafficNetwork();
@@ -185,66 +143,63 @@ int main() {
                 obj.blockRoad();
                 break;
             case 6:
-                cout<<"Emergency Vehicle? (Y/N): ";
+                cout << "Emergency Vehicle? (Y/N): ";
                 char choice;
-                cin>>choice;
+                cin >> choice;
 
-                cout<<"Enter Vehicle Name: ";
-                cin>>name;
+                cout << "Enter Vehicle Name: ";
+                cin >> name;
 
                 char start, end;
-                cout<<"Enter Start and End Road: ";
-                cout<<"Enter Start and End Road: ";
-                cin>>start;
-                cin>>end;
+                cout << "Enter Start and End Road: ";
+                cin >> start;
+                cin >> end;
 
                 s = obj.getIntersection(start);
                 e = obj.getIntersection(end);
 
-                if (choice=='y' || choice == 'Y') {
+                if (choice == 'y' || choice == 'Y') {
                     string priority;
-                    cout<<"Enter Vehicle priority: ";
-                    cin>>priority;
+                    cout << "Enter Vehicle priority: ";
+                    cin >> priority;
 
                     EmergencyVehicle* ev = new EmergencyVehicle(name, s, e, priority);
                     obj.addVehicle(ev, 1);
-                }
-                else {
+                } else {
                     Vehicle* v = new Vehicle(name, s, e, 0);
                     obj.addVehicle(v);
                 }
                 break;
             case 7:
-                cout<<"Simulate for a Specific Time? (Y/N): ";
+                cout << "Simulate for a Specific Time? (Y/N): ";
                 char ch;
-                cin>>ch;
-                if(ch=='y' || ch=='Y'){
-                    int t=0;
-                    cout<<"Enter Time(sec): ";
-                    cin>>t;
+                cin >> ch;
+                if (ch == 'y' || ch == 'Y') {
+                    int t = 0;
+                    cout << "Enter Time(sec): ";
+                    cin >> t;
                     obj.startSimulation(t);
-
-                }else{
+                } else {
                     obj.startSimulation();
                 }
                 break;
             case 8:
-                cout<<"Try again\n";
+                cout << "Try again\n";
             default:
-                cout<<"\n-------------- Exiting --------------\n";
+                cout << "\n-------------- Exiting --------------\n";
                 return 0;
                 break;
         }
-        
-        cout<<"-----------------Simulation Dashboard------------------------\n";
-        cout<<"1. Display City Traffic Network\n";
-        cout<<"2. Display Traffic Signal Status\n";
-        cout<<"3. Display Congestions Status\n";
-        cout<<"4. Display Bloacked Roads\n";
-        cout<<"5. Block a Road\n";
-        cout<<"6. Add a Vehicle/Emergency Vehicle\n";
-        cout<<"7. Simulate Vehicle Routing\n";
-        cout<<"8. Exit Simulation\n";
-        cin>>choice;
+
+        cout << "-----------------Simulation Dashboard------------------------\n";
+        cout << "1. Display City Traffic Network\n";
+        cout << "2. Display Traffic Signal Status\n";
+        cout << "3. Display Congestions Status\n";
+        cout << "4. Display Blocked Roads\n";
+        cout << "5. Block a Road\n";
+        cout << "6. Add a Vehicle/Emergency Vehicle\n";
+        cout << "7. Simulate Vehicle Routing\n";
+        cout << "8. Exit Simulation\n";
+        cin >> choice;
     }
 }

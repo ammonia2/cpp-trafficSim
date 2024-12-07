@@ -1,6 +1,5 @@
 #pragma once
 
-#include <SFML/Graphics.hpp>
 #include "vehicle.h"
 #include "intersection.h"
 #include <iostream>
@@ -8,7 +7,6 @@
 #include "priority_queue.h"
 #include <cmath>
 using namespace std;
-using namespace sf;
 
 
 class Vehicle;

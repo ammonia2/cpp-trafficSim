@@ -1,11 +1,9 @@
 #pragma once
 
-#include <SFML/Graphics.hpp>
 #include <iostream>
 #include "DynamicArray.h"
 #include "traffic_signal.h"
 using namespace std;
-using namespace sf;
 
 class Road;
 
@@ -37,9 +35,11 @@ class Intersection {
     void set_Y(int a){
         y=a;
     }
-    DynamicArray<Road*>getInroads(){
+    
+    DynamicArray<Road*> getInroads(){
         return inRoads;
     }
+
     string getSignal(Road* road);
     
     int get_X(){
