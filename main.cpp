@@ -1420,8 +1420,6 @@ class Road {
     }
 
     void displayQ() {
-        cout<<"YO\n";
-        cout<<"Q size: "<<priority_Queue.getSize()<<endl;
         priority_Queue.display();
     }
 
@@ -1796,9 +1794,6 @@ void Intersection::calculateSignalTimings() {
             }
             signals.push_back(signal);
 
-            // cout << "Signal for road to " << road->getDest()->getName()
-            //     << " set to GREEN: " << greenTime << " seconds, RED: " << roadRedTime << " seconds. Current Red: " 
-            //     << (totalCycleTime - (i* (greenTime+3))) <<  endl;
         }
     }
 }
@@ -2022,9 +2017,6 @@ class AdjacencyList {
         for (Vehicle* vehicle: vehicles) {
             DynamicArray<char> refs = dijkstraAlgo(vehicle->getStart(), vehicle->getEnd());
             DynamicArray<char> path = constructPath(refs, vehicle->getStart(), vehicle->getEnd());
-            cout<<vehicle->getName()<<" ";
-            path.display();
-            cout<<endl;
             vehicle->clearRoute();
             if(!path.empty()) {
                 for (int i=0; i<path.size()-1; i++) {
@@ -2643,11 +2635,34 @@ class AdjacencyList {
                     cout<<inrd->getDest()->getSignalTime(inrd)<<"\033[0m";
                 } 
                 else if (inrd->getDest()->getSignal(inrd) == "YELLOW") {
-                    cout << "\033[1;34mSignal "<< count << ": YELLOW TIME: ";
+                    cout << "\033[1;33mSignal "<< count << ": YELLOW TIME: ";
                     cout<<inrd->getDest()->getSignalTime(inrd)<<"\033[0m";
                 }
                 count++;
                 cout<<endl;
+            }
+        }
+    }
+
+    void displayVehiclePaths(){
+        cout<<"\033[1;34m---------------Vehicle's Travel Routes-------------------\033[0m\n";
+        for(Vehicle* veh : vehicles){
+            if(veh->getPriorityLevel()==0){
+                cout<<"\033[1;32m"<<veh->getName()<<" : ";
+                DynamicArray<Road*> route=veh->getRoute();
+                if(route.empty()){
+                    cout<<"\033[1;31mNo Path Found.\033[0m\n";
+                }                
+                else{
+                    cout<<veh->getStart()->getName();
+                    int weight=0;
+                    for(Road* rd:route){
+                        weight+=rd->getWeight();
+                        cout<<"->"<<rd->getDest()->getName();
+                    }
+                    cout<<"\033[1;33m  | Weight: "<<weight;
+                    cout<<"\033[0m\n";
+                }
             }
         }
     }
@@ -2781,29 +2796,6 @@ class AdjacencyList {
         initialiseEmergencyVehicles();
     }
 
-    // void initialiseRoutes(char start, Road* road) {
-    //     //Storing Current index, as after removing hashmap is reset so storing current intersection to 
-    //     // start from where ended, but not working , a vehicle is present on multiple keys 
-    //     // after all iniitalizing and some times displayed 2 times on same key. 
-    //     for(Vehicle* veh: vehicles){
-    //         cout<<veh->getName()<<" "<<veh->getStart()->getName()<<endl;
-    //         if(veh->getIndex()!=0 && !veh->getAtDest())
-    //             veh->setStart(veh->getRoute()[veh->getIndex()-1]->getDest());
-    //         cout<<veh->getName()<<" "<<veh->getStart()->getName()<<endl;
-    //     }
-    //     for (Vehicle* vehicle : vehicles) {
-    //         vehicle->clearRoute();
-    //         // vehicle->setTime(20);
-    //         vehicle->setAtDest(false);
-    //     }
-
-    //     roadVehicleMap.clear();
-    //     display_Vehicles_at_Roads();
-    //     initialiseVehicles();
-    //     initialiseEmergencyVehicles();
-        
-    // }
-
     void clearQueues() {
         for (Intersection* intsc: intersections) {
             LinkedList<Road*>& edges = graph[intsc->getName() - 'A'];
@@ -2933,6 +2925,14 @@ public:
         graph.displayBlockedRoads();
     }
 
+    void displayPaths(){
+        if (!graph.getInitialised()) {
+            graph.initialiseRoutes();
+            graph.setInitialised(true);
+        }
+        graph.displayVehiclePaths();
+    }
+
     void blockRoad() {
         char start, end;
         cout << "Enter Start Intersection of the road to Block: ";
@@ -2941,13 +2941,11 @@ public:
         cin >> end;
 
         Road* road = graph.findRoad(start, end);
-        // if (road && road->getTrafficLoad() >0) {
-        //     cout<<"Vehicles present in the road. Can't block it yetn\n";
-        // }
-         if (road) {
+        if (road && road->getTrafficLoad() >0) {
+            cout<<"Vehicles present in the road. Can't block it yetn\n";
+        }
+        if(road) {
             road->setStatus("Blocked");
-            // graph.clearQueues();
-            // graph.initialiseRoutes(start, road);
             return;
         }
         cout << "Road Not Found!\n";
@@ -2969,10 +2967,11 @@ int main() {
     cout << "2. Display Traffic Signal Status\n";
     cout << "3. Display Congestions Status\n";
     cout << "4. Display Blocked Roads\n";
-    cout << "5. Block a Road\n";
-    cout << "6. Add a Vehicle/Emergency Vehicle\n";
-    cout << "7. Simulate Vehicle Routing\n";
-    cout << "8. Exit Simulation\n";
+    cout << "5. Display Vehicle Paths\n";
+    cout << "6. Block a Road\n";
+    cout << "7. Add a Vehicle/Emergency Vehicle\n";
+    cout << "8. Simulate Vehicle Routing\n";
+    cout << "9. Exit Simulation\n";
 
     int choice;
     cin >> choice;
@@ -2995,9 +2994,12 @@ int main() {
                 obj.displayBlockedRoads();
                 break;
             case 5:
-                obj.blockRoad();
+                obj.displayPaths();
                 break;
             case 6:
+                obj.blockRoad();
+                break;
+            case 7:
                 cout << "Emergency Vehicle? (Y/N): ";
                 char choice;
                 cin >> choice;
@@ -3025,7 +3027,7 @@ int main() {
                     obj.addVehicle(v);
                 }
                 break;
-            case 7:
+            case 8:
                 cout << "Simulate for a Specific Time? (Y/N): ";
                 char ch;
                 cin >> ch;
@@ -3038,7 +3040,7 @@ int main() {
                     obj.startSimulation();
                 }
                 break;
-            case 8:
+            case 9:
                 cout << "Try again\n";
             default:
                 cout << "\n-------------- Exiting --------------\n";
@@ -3051,10 +3053,11 @@ int main() {
         cout << "2. Display Traffic Signal Status\n";
         cout << "3. Display Congestions Status\n";
         cout << "4. Display Blocked Roads\n";
-        cout << "5. Block a Road\n";
-        cout << "6. Add a Vehicle/Emergency Vehicle\n";
-        cout << "7. Simulate Vehicle Routing\n";
-        cout << "8. Exit Simulation\n";
+        cout << "5. Display Vehicle Paths\n";
+        cout << "6. Block a Road\n";
+        cout << "7. Add a Vehicle/Emergency Vehicle\n";
+        cout << "8. Simulate Vehicle Routing\n";
+        cout << "9. Exit Simulation\n";
         cin >> choice;
     }
 }
