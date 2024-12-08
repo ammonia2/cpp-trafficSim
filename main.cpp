@@ -63,6 +63,10 @@ public:
     }
 
     void displayCongestionStatus() {
+        if (!graph.getInitialised()) {
+            graph.initialiseRoutes();
+            graph.setInitialised(true);
+        }
         graph.display_Vehicles_at_Roads();
     }
 
@@ -78,6 +82,14 @@ public:
         graph.displayBlockedRoads();
     }
 
+    void displayPaths(){
+        if (!graph.getInitialised()) {
+            graph.initialiseRoutes();
+            graph.setInitialised(true);
+        }
+        graph.displayVehiclePaths();
+    }
+
     void blockRoad() {
         char start, end;
         cout << "Enter Start Intersection of the road to Block: ";
@@ -89,7 +101,7 @@ public:
         if (road && road->getTrafficLoad() >0) {
             cout<<"Vehicles present in the road. Can't block it yetn\n";
         }
-         if (road) {
+        if(road) {
             road->setStatus("Blocked");
             return;
         }
@@ -112,10 +124,11 @@ int main() {
     cout << "2. Display Traffic Signal Status\n";
     cout << "3. Display Congestions Status\n";
     cout << "4. Display Blocked Roads\n";
-    cout << "5. Block a Road\n";
-    cout << "6. Add a Vehicle/Emergency Vehicle\n";
-    cout << "7. Simulate Vehicle Routing\n";
-    cout << "8. Exit Simulation\n";
+    cout << "5. Display Vehicle Paths\n";
+    cout << "6. Block a Road\n";
+    cout << "7. Add a Vehicle/Emergency Vehicle\n";
+    cout << "8. Simulate Vehicle Routing\n";
+    cout << "9. Exit Simulation\n";
 
     int choice;
     cin >> choice;
@@ -138,9 +151,12 @@ int main() {
                 obj.displayBlockedRoads();
                 break;
             case 5:
-                obj.blockRoad();
+                obj.displayPaths();
                 break;
             case 6:
+                obj.blockRoad();
+                break;
+            case 7:
                 cout << "Emergency Vehicle? (Y/N): ";
                 char choice;
                 cin >> choice;
@@ -168,7 +184,7 @@ int main() {
                     obj.addVehicle(v);
                 }
                 break;
-            case 7:
+            case 8:
                 cout << "Simulate for a Specific Time? (Y/N): ";
                 char ch;
                 cin >> ch;
@@ -181,7 +197,7 @@ int main() {
                     obj.startSimulation();
                 }
                 break;
-            case 8:
+            case 9:
                 cout << "Try again\n";
             default:
                 cout << "\n-------------- Exiting --------------\n";
@@ -194,10 +210,11 @@ int main() {
         cout << "2. Display Traffic Signal Status\n";
         cout << "3. Display Congestions Status\n";
         cout << "4. Display Blocked Roads\n";
-        cout << "5. Block a Road\n";
-        cout << "6. Add a Vehicle/Emergency Vehicle\n";
-        cout << "7. Simulate Vehicle Routing\n";
-        cout << "8. Exit Simulation\n";
+        cout << "5. Display Vehicle Paths\n";
+        cout << "6. Block a Road\n";
+        cout << "7. Add a Vehicle/Emergency Vehicle\n";
+        cout << "8. Simulate Vehicle Routing\n";
+        cout << "9. Exit Simulation\n";
         cin >> choice;
     }
 }

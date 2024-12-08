@@ -229,9 +229,7 @@ class AdjacencyList {
         for (Vehicle* vehicle: vehicles) {
             DynamicArray<char> refs = dijkstraAlgo(vehicle->getStart(), vehicle->getEnd());
             DynamicArray<char> path = constructPath(refs, vehicle->getStart(), vehicle->getEnd());
-            cout<<vehicle->getName()<<" ";
-            path.display();
-            cout<<endl;
+            
             vehicle->clearRoute();
             if(!path.empty()) {
                 for (int i=0; i<path.size()-1; i++) {
@@ -877,6 +875,7 @@ class AdjacencyList {
     }
 
     void appendVehicle(Vehicle* vehicle) {
+        vehicles.push_back(vehicle);
         DynamicArray<char> refs = dijkstraAlgo(vehicle->getStart(), vehicle->getEnd());
         DynamicArray<char> path = constructPath(refs, vehicle->getStart(), vehicle->getEnd());
         if(!path.empty()) {
@@ -1041,6 +1040,29 @@ class AdjacencyList {
             cout << "\033[1;32mNo blocked roads in the network\033[0m" << endl;
         }
         cout << endl;
+    }
+
+    void displayVehiclePaths(){
+        cout<<"\033[1;34m---------------Vehicle's Travel Routes-------------------\033[0m\n";
+        for(Vehicle* veh : vehicles){
+            if(veh->getPriorityLevel()==0){
+                cout<<"\033[1;32m"<<veh->getName()<<" : ";
+                DynamicArray<Road*> route=veh->getRoute();
+                if(route.empty()){
+                    cout<<"\033[1;31mNo Path Found.\033[0m\n";
+                }                
+                else{
+                    cout<<veh->getStart()->getName();
+                    int weight=0;
+                    for(Road* rd:route){
+                        weight+=rd->getWeight();
+                        cout<<"->"<<rd->getDest()->getName();
+                    }
+                    cout<<"\033[1;33m  | Weight: "<<weight;
+                    cout<<"\033[0m\n";
+                }
+            }
+        }
     }
 
 };

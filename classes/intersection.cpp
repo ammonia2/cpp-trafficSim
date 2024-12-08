@@ -98,7 +98,6 @@ void Intersection::updateSignals() {
             }
         }
 
-
         // Switch signals only if a more congested road
         if (highestLoadIndex != -1 && highestLoadIndex != currentGreenIndex) {
             int totalCycleTime = inRoads.size() * (greenTime + 3);
@@ -115,8 +114,7 @@ void Intersection::updateSignals() {
                 }
             }
 
-            cout<<"\n\033[1;33Changed signal timings for intersection: "<<name<<"\033[0m\n";
+            cout<<"\n\033[1;33mChanged signal timings for intersection: "<<name<<"\033[0m\n";
         }
     }
 }
-
