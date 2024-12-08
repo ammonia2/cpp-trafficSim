@@ -73,27 +73,27 @@ Simply run the command:      *g++ -o app main.cpp & ./app*
 
 ###
 1) **Simulation Dashboard**
-![Simulation Dashboard](image.png)
+![Simulation Dashboard](photos/image.png)
 
 2) **City Traffic Network**
-![City Traffic Network](image-1.png)
+![City Traffic Network](photos/image-1.png)
 
 3) **Traffic Signal Status**
-![Traffic Signal Status](image-2.png)
+![Traffic Signal Status](photos/image-2.png)
 
 4) **Display Blocked Roads**
-![Blocked Roads](image-3.png)
+![Blocked Roads](photos/image-3.png)
 
 5) **Manually Block Roads**
-![Manual Road Blockage](image-4.png)
-![Result of Manual Road Blockage](image-5.png)
+![Manual Road Blockage](photos/image-4.png)
+![Result of Manual Road Blockage](photos/image-5.png)
 
 6) **Manually Add Vehicles**
-![Add Normal Vehicle](image-6.png)
-![Add Emergency Vehicle](image-7.png)
+![Add Normal Vehicle](photos/image-6.png)
+![Add Emergency Vehicle](photos/image-7.png)
 
 7) **Vehicle Routing Simulation**
-![Vehicle Routes](image-10.png)
-![Real-Time Routing](image-8.png)
-![Real-Time Routing](image-9.png)
+![Vehicle Routes](photos/image-10.png)
+![Real-Time Routing](photos/image-8.png)
+![Real-Time Routing](photos/image-9.png)
 ###
