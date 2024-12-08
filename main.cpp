@@ -9,13 +9,7 @@
 #include <fstream>
 #include <algorithm>
 #include <sstream>
-// #include "classes/hash_table.h"
-// #include "classes/list.h"
-// #include "classes/priority_queue.h"
-// #include "classes/queue.h"
-// #include "classes/stack.h"
-// #include "classes/adjacency_list.h"
-// #include "classes/DynamicArray.h"
+
 class Road;
 class Vehicle;
 class Intersection;
@@ -1799,8 +1793,64 @@ void Intersection::calculateSignalTimings() {
 }
 
 void Intersection::updateSignals() {
+    // Updating all signals
     for (TrafficSignal& signal : signals) {
         signal.update();
+    }
+
+    if (signals.size() <= 1) return;
+
+    // Identifying the current green signal
+    int currentGreenIndex = -1;
+    for (int i = 0; i < signals.size(); ++i) {
+        if (signals[i].getState() == "GREEN") {
+            currentGreenIndex = i;
+            break;
+        }
+    }
+
+    if (currentGreenIndex == -1) {
+        return;
+    }
+
+    Road* currentGreenRoad = inRoads[currentGreenIndex];
+
+    if (currentGreenRoad->getTrafficLoad() == 0) {
+
+        int maxLoad = -1;
+        int highestLoadIndex = -1;
+
+        for (int i = 0; i < inRoads.size(); ++i) {
+            int currentLoad = inRoads[i]->getTrafficLoad();
+            if (currentLoad == 0) continue;
+
+            // only if there's a vehicle ready to move
+            Vehicle* vehicle = inRoads[i]->getHeapTop();
+            if (currentLoad > maxLoad && vehicle && vehicle->getTime() == 0) {
+                maxLoad = currentLoad;
+                highestLoadIndex = i;
+            }
+        }
+
+
+        // Switch signals only if a more congested road
+        if (highestLoadIndex != -1 && highestLoadIndex != currentGreenIndex) {
+            int totalCycleTime = inRoads.size() * (greenTime + 3);
+
+            for (int i = 0; i < inRoads.size(); ++i) {
+                int idx = (highestLoadIndex + i) % inRoads.size();
+
+                if (i == 0) {
+                    signals[idx].setState("GREEN");
+                    signals[idx].resetTime();
+                } else {
+                    signals[idx].setState("RED");
+                    signals[idx].setCurrentTime(totalCycleTime - (i * (greenTime + 3)));
+                }
+            }
+
+            cout<<"\n\033[1;33mChanged signal timings for intersection: "<<name<<"\033[0m\n";
+        }
     }
 }
 
@@ -2693,6 +2743,8 @@ class AdjacencyList {
     }
 
     void appendVehicle(Vehicle* vehicle) {
+        vehicles.push_back(vehicle);
+
         DynamicArray<char> refs = dijkstraAlgo(vehicle->getStart(), vehicle->getEnd());
         DynamicArray<char> path = constructPath(refs, vehicle->getStart(), vehicle->getEnd());
         if(!path.empty()) {
