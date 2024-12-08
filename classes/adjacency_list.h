@@ -439,8 +439,7 @@ class AdjacencyList {
         return path;
     }
 
-    // exact way to measure heuristic is to calculate the travelTime from the edge to the ending edge. 
-    // (could also require checking congestion (secondary weight))
+    // exact way to measure heuristic is to calculate the travelTime & congestion level from the edge to the ending edge. 
 
     DynamicArray<char> aStarAlgo(Intersection* start, Intersection* end) {
 
@@ -535,8 +534,6 @@ class AdjacencyList {
         return previousReferences;
     }
 
-    // set a 1 sec delay in addition of vehicles in vehicle array so each car appears
-    // behind the other and no collision happens to occur
     void updateSimulation() {
         DynamicArray<Vehicle*> atRoadEnd;
         DynamicArray<Road*> doneRoads;
@@ -651,11 +648,6 @@ class AdjacencyList {
                             road->removeVehicle();
                         }
                     }
-
-                    // FINDING NEXT ROAD
-                    // need to add the functionality that if the next road is blocked, then the 
-                    // route needs to be recalculated from that intersection (don't forget to
-                    // delete the roads ahead of that!)
 
                     // Updating HashMap
                     if( veh->getIndex()>temp_idx && route.size()!=veh->getIndex() ) {
@@ -987,29 +979,6 @@ class AdjacencyList {
         initialiseVehicles();
         initialiseEmergencyVehicles();
     }
-
-    // void initialiseRoutes(char start, Road* road) {
-    //     //Storing Current index, as after removing hashmap is reset so storing current intersection to 
-    //     // start from where ended, but not working , a vehicle is present on multiple keys 
-    //     // after all iniitalizing and some times displayed 2 times on same key. 
-    //     for(Vehicle* veh: vehicles){
-    //         cout<<veh->getName()<<" "<<veh->getStart()->getName()<<endl;
-    //         if(veh->getIndex()!=0 && !veh->getAtDest())
-    //             veh->setStart(veh->getRoute()[veh->getIndex()-1]->getDest());
-    //         cout<<veh->getName()<<" "<<veh->getStart()->getName()<<endl;
-    //     }
-    //     for (Vehicle* vehicle : vehicles) {
-    //         vehicle->clearRoute();
-    //         // vehicle->setTime(20);
-    //         vehicle->setAtDest(false);
-    //     }
-
-    //     roadVehicleMap.clear();
-    //     display_Vehicles_at_Roads();
-    //     initialiseVehicles();
-    //     initialiseEmergencyVehicles();
-        
-    // }
 
     void clearQueues() {
         for (Intersection* intsc: intersections) {

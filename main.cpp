@@ -86,13 +86,11 @@ public:
         cin >> end;
 
         Road* road = graph.findRoad(start, end);
-        // if (road && road->getTrafficLoad() >0) {
-        //     cout<<"Vehicles present in the road. Can't block it yetn\n";
-        // }
+        if (road && road->getTrafficLoad() >0) {
+            cout<<"Vehicles present in the road. Can't block it yetn\n";
+        }
          if (road) {
             road->setStatus("Blocked");
-            // graph.clearQueues();
-            // graph.initialiseRoutes(start, road);
             return;
         }
         cout << "Road Not Found!\n";
